@@ -1,0 +1,197 @@
+<!-- import React from 'react';
+import {
+  Col,
+  Row,
+  Nav,
+  Card,
+  Table,
+  Form,
+  Button,
+  ButtonGroup,
+  Breadcrumb,
+  InputGroup,
+  Dropdown,
+} from "@themesberg/react-bootstrap";
+import moment from "moment";
+import "./style.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faPhone, faVoicemail } from '@fortawesome/free-solid-svg-icons';
+
+export class Invoice extends React.Component {
+
+  // formatCurrency(x){
+  //   if(x!=='null' && x!=='0'){
+  //     const parts = x.toString().split(".");
+  //     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  //     return `\u20a6${parts.join(".")}`;
+  //   }
+  //   return '0';
+  // }
+
+  totalCart() {
+    const { receipt } = this.props;
+    let sum = 0;
+
+    for (let i = 0; i < receipt.length; i += 1) {
+      sum += receipt[i].quantity * receipt[i].unit_selling_price;
+
+    }
+    return sum;
+  }
+  formatCurrency2(x) {
+    if (x !== null && x !== 0) {
+      const parts = x.toString().split(".");
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return `${parts.join(".")}`;
+    }
+    return 0;
+  }
+
+  formatCurrency(y, x) {
+    if (x !== 'null' && x !== '0') {
+      const parts = x.toString().split(".");
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return `${y}${parts.join(".")}`;
+    }
+    return '0';
+  }
+
+  render() {
+    const { invoice, previous_payment, items } = this.props;
+
+    return (
+      <div>
+        {Object.keys(invoice).length !== 0 &&
+
+          <div id="invoice-POS">
+            {console.log(items)}
+
+            <center id="top">
+              <div class="logo"><img src={require("../../assets/img/brand/logo.png")} /></div>
+              <div class="info">
+                <h1 style={{ fontWeight: 'bold' }}>Hayzee Computer Resources</h1>
+                <p style={{ textAlign: 'center' }}>
+                  Sales, installation & repair of Laptops and Smartphones
+                  Installation and maintenance of solar inverter system and CCTV<br /><br />
+                  <span style={{ textAlign: 'center' }}> <span><FontAwesomeIcon icon={faPhone} /> 08037586863, &nbsp;08092777906</span><span>&nbsp;&nbsp;
+                    <FontAwesomeIcon icon={faEnvelope} />&nbsp;www.hayzeeonline.com</span></span>
+                </p>
+              </div>
+            </center>
+
+
+            <div id="mid">
+              <table style={{ fontSize: '10px' }}>
+                <tr>
+
+                  <td><p>Invoice #:{invoice.invoice_no}<br />
+                    Created:{moment(invoice.issued_date).format('MMM DD YYYY')}<br />
+                   {invoice.due_date === invoice.issued_date ? '' :`  Due:`+moment(invoice.due_date).format('MMM DD YYYY')}<br /></p>
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan={2}>
+                    <p>
+                      Spectral,Business Center.<br />
+                      South Campus<br />
+                      The Polytechnic Ibadan<br />
+                      Ibadan, Oyo State.
+                    </p>
+                  </td>
+                  <td style={{ paddingLeft: 10 }}>
+                    <p>
+                      {invoice.client.name}<br />
+                      {invoice.client.address}<br />
+                      {invoice.client.email}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+
+            </div>
+
+            <div id="bot">
+
+              <div id="table">
+
+                <table>
+                  <tr class="tabletitle">
+
+                
+                    <th><p class="itemtext2" style={{paddingLeft:0}}>Product</p></th>
+                    <th><p class="itemtext2">Description</p></th>
+                    <th><p class="itemtext2">Quantity</p></th>
+                    <th><p class="itemtext2">Rate</p></th>
+                    <th><p class="itemtext2">Cost</p></th>
+                  </tr>
+
+                  {Object.keys(items).length !== 0 ? items.map((item, key) => {
+
+                    return (
+                      <tr class="service" style={{fontSize:'0.9em'}}>
+                        <td class="tableitem"><h1 class="itemtext" >{item.name}</h1></td>
+                        <td >
+                          <tr>
+                            <td class="tableitem"><p class="itemtext">{item.description}</p></td>
+                          </tr>
+                        </td>
+
+                        <td class="tableitem"><p class="itemtext">{item.quantity}</p></td>
+                        <td class="tableitem"><p class="itemtext">{item.rate}</p></td>
+                        <td class="tableitem"><p class="itemtext">{this.formatCurrency2(item.amount)}</p></td>
+                      </tr>
+
+                    );
+                  }) : ''}
+                  <tr class="tabletitle">
+                    <td colSpan={3}></td>
+                    <td class="Rate"><h2>Total</h2></td>
+                    <td class="payment"><h2>{this.formatCurrency(invoice.currency, invoice.amount)}</h2></td>
+                  </tr>
+                  <tr class="tabletitle" style={{paddingTop:10}}>
+                    <td colSpan={3}></td>
+                    <td class="Rate"><h2>Paid</h2></td>
+                    <td class="payment"><h2>{this.formatCurrency(invoice.currency, invoice.amount_paid)}</h2></td>
+                  </tr>
+                  <tr class="tabletitle">
+                    <td colSpan={3}></td>
+                    <td class="Rate"><h2>Balance</h2></td>
+                    <td class="payment"><h2>{this.formatCurrency(invoice.currency, invoice.balance)}</h2></td>
+                  </tr>
+
+                </table>
+              </div>
+
+              <div id="legalcopy">
+                <p class="legal"><strong>Thanks for your patronage!&nbsp;&nbsp;</strong></p>
+              </div>
+              <div id="legalcopy">
+                <p class="legal"><strong>Terms and Condition!&nbsp;&nbsp;</strong><br/><br/>
+                
+                  Good Sold under good condition are not returnable<br />
+                  No refund of money after payment<br />
+                  We charge 20% re-stocking fee for all returned items (If considered)<br />
+                </p>
+              </div>
+              <table>
+                <tr style={{marginBottom:'10px'}}>
+                  <td>__________________<br/><span style={{fontSize:10, textAlign:'center'}}>Customer Signature</span></td>
+                 
+                  <td>__________________<br/><span style={{fontSize:10, textAlign:'center'}}>Hayzee Computer Resources</span></td>
+                </tr>
+              </table>
+
+              
+
+            </div>
+          </div>
+
+
+        }
+      </div>
+
+    );
+  }
+}
+export default Invoice; -->

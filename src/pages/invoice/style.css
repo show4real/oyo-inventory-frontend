@@ -1,0 +1,160 @@
+body {
+    margin: 0;
+    padding: 0;
+    
+}
+.invoice_body{
+    font-family: monaco, Consolas, Lucida Console, monospace;
+    
+}
+.row-spacing{
+    margin-bottom: 0px;
+height: auto;
+font-family: monaco, Consolas, Lucida Console, monospace;
+font-size: 15px;
+width: 100%;
+
+}
+
+
+@page {
+    size:'auto';
+    margin-top: 0cm;
+    margin-left: 0cm;
+    margin-right: 0cm;
+    min-height: 40px;
+}
+
+table {
+    width: 100%;
+    
+}
+
+tr {
+    width: 100%;
+
+}
+
+h1 {
+    text-align: center;
+    vertical-align: middle;
+}
+
+#logo {
+    width: 60%;
+    text-align: center;
+    -webkit-align-content: center;
+    align-content: center;
+    padding: 5px;
+    margin: 2px;
+    display: block;
+    margin: 0 auto;
+}
+
+header {
+    width: 100%;
+    text-align: center;
+    -webkit-align-content: center;
+    align-content: center;
+    vertical-align: middle;
+}
+
+.items thead {
+    text-align: center;
+}
+
+.center-align {
+    text-align: center;
+}
+
+.bill-details td {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.receipt {
+    font-size: medium;
+    font-weight: 700;
+}
+
+.items .heading {
+    font-size: 12.5px;
+    text-transform: uppercase;
+    border-top:1px solid black;
+    margin-bottom: 4px;
+    border-bottom: 1px solid black;
+    vertical-align: middle;
+    font-weight: 700;
+}
+
+.items thead tr th:first-child,
+.items tbody tr td:first-child {
+    width: 47%;
+    min-width: 47%;
+    max-width: 47%;
+    font-weight: 700;
+    word-break: break-all;
+    text-align: left;
+}
+
+.items td {
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+    color:black;
+    vertical-align: bottom;
+}
+
+.price::before {
+    font-family: Arial;
+    text-align: right;
+    color:black;
+    font-size:18px;
+    font-family: monaco, Consolas, Lucida Console, monospace;
+}
+
+.sum-up {
+    text-align: right !important;
+    font-family: monaco, Consolas, Lucida Console, monospace;
+  
+    padding:10;
+}
+.total {
+    font-size: 13px;
+    font-weight: 700;
+    border-top:1px dashed black !important;
+    border-bottom:1px dashed black !important;
+    color:black;
+}
+
+.total.text, .total.price {
+    text-align: right;
+    color:black;
+    font-family: monaco, Consolas, Lucida Console, monospace;
+}
+.total.price::before {
+    content: ""; 
+}
+.line {
+    border-top:1px solid black !important;
+}
+.heading.rate {
+    width:auto;
+}
+.heading.amount {
+    width:auto;
+}
+.heading.qty {
+    width:auto;
+}
+.heading.description {
+    width:100%;
+}
+p {
+    padding: 1px;
+    margin: 0;
+}
+section, footer {
+    font-size: 12px;
+    font-weight: 700;
+}

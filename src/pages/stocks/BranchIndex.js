@@ -1,0 +1,209 @@
+import React, { Component } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Input } from "reactstrap";
+import { getBranches } from "../../services/branchService";
+import { toast } from "react-toastify";
+import { Pagination } from "antd";
+import {
+  Col,
+  Row,
+  Card,
+  Table,
+  Button,
+  ButtonGroup,
+  Breadcrumb,
+  Form,
+} from "@themesberg/react-bootstrap";
+
+import SpinDiv from "../components/SpinDiv";
+
+export class BranchIndex extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      search: "",
+      page: 1,
+      rows: 10,
+      loading: false,
+      branches: [],
+      value:"",
+      total: 0,
+    }
+  }
+
+  componentDidMount() {
+   this.getBranches();
+  }
+  
+
+  showToast = (msg) => {
+    toast(<div style={{ padding: 20, color: "green" }}>{msg}</div>);
+  };
+  getBranches = () => {
+
+    const { page, rows, search} = this.state;
+    this.setState({ loading: true });
+    getBranches({ page, rows, search }).then(
+      (res) => {
+        this.setState({
+          loading: false,
+          branches:res.branches.data,
+          total:res.branches.total
+        });
+      },
+      (error) => {
+        this.setState({ loading: false });
+      }
+    );
+  };
+
+  onChange = (e, state) => {
+    this.setState({ [state]: e });
+  };
+
+  onPage = async (page, rows) => {
+    await this.setState({ page, rows });
+    await this.getBranches();
+  }
+  
+  
+  
+  render() {
+    const {
+      branches,
+      total,
+      addBranches,
+      editBranch,
+      rows,
+      page,
+      search,
+      loading,
+      filtering
+    } = this.state;
+    return (
+      <>
+      
+        
+       
+
+        {loading && <SpinDiv text={"Loading..."} />}
+        <Row style={{}}>
+          <Col lg="12">
+            <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+              <div className="d-block mb-4 mb-md-0">
+                <Breadcrumb
+                  listProps={{
+                    className: " breadcrumb-text-dark text-primary",
+                  }}
+                >
+                  <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+                  <Breadcrumb.Item href="#products">Stock Branches</Breadcrumb.Item>
+                </Breadcrumb>
+              </div>
+              <div className="btn-toolbar mb-2 mb-md-0">
+                
+              </div>
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          <Col lg="7">
+            <h6>Branches({total})</h6>
+           
+          </Col>
+          
+          <Col lg="4" className="">
+            <div style={{ display: "flex" }}>
+              <Input
+                placeholder="Search..."
+                id="show"
+                style={{ maxHeight: 45, marginRight: 5, marginBottom: 10 }}
+                value={search}
+                onChange={(e) => this.onChange(e.target.value, "search")}
+                autoFocus
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    this.getBranches();
+                    this.setState({
+                      search: "",
+                    });
+                  }
+                }}
+              />
+              <Button
+                className="btn-icon btn-2"
+                color="secondary"
+                style={{ maxHeight: 45 }}
+                size="sm"
+                onClick={this.getBranches}
+              >
+                <i className="fa fa-search" />
+              </Button>
+            </div>
+          </Col>
+        </Row>
+        
+        <Card border="light" className="shadow-sm mb-4">
+          
+          <Card.Body className="pb-0">
+            <Table
+              responsive
+              className="table-centered table-nowrap rounded mb-0"
+            >
+              <thead className="thead-light">
+                <tr>
+                  <th className="border-0">Branch</th>
+                  <th className="border-0">No of stocks</th>
+                </tr>
+              </thead>
+              <tbody>
+            
+                {branches.map((branch, key) => {
+                  return (
+                    <tr key={key}>
+                      <td>{branch.name}</td>
+                      <td>{branch.stocks_count}</td>
+                      <td>
+                            <Button
+                              variant='outline-primary'
+                              onClick={() => {
+                          
+                                this.props.history.push(
+                                  "/stocks/" +
+                                    branch.id 
+    
+                                );
+                              }}
+                              size="sm"
+                            >
+                              View Stocks
+                            </Button>
+                      </td>
+                      
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </Table>
+            {branches.length<1&&
+                <div style={{color: '#ccc', alignSelf: 'center', padding: 10, fontSize: 13}}>
+                  <i className="fa fa-ban" style={{marginRight: 5}}/>
+                  No Branches
+                </div>}
+            {branches.lenght > 0 &&  <Pagination
+                        showSizeChanger
+                        defaultCurrent={6}
+                        total={total}
+                        showTotal={total => `Total ${total} Stocks`}
+                        onChange={this.onPage}
+                        pageSize={rows}
+                        current={page}
+                      />}
+          </Card.Body>
+        </Card>
+      </>
+    );
+  }
+}
+
+export default BranchIndex;
