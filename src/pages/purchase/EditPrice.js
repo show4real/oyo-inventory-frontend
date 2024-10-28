@@ -12,61 +12,58 @@ import {
   InputGroup,
   Dropdown,
 } from "@themesberg/react-bootstrap";
-import {Button} from "antd"
-import {editPrice} from "../../services/purchaseOrderService"
+import { Button } from "antd";
+import { editPrice } from "../../services/purchaseOrderService";
 import SpinDiv from "../components/SpinDiv";
 import { toast } from "react-toastify";
-
 
 export class EditPrice extends Component {
   constructor(props) {
     super(props);
     this.state = {
-     saving:false,
-     loading:false,
-     unit_selling_price:props.stock.unit_selling_price,
-     id:props.stock.id,
-     submitted:false,
+      saving: false,
+      loading: false,
+      unit_selling_price: props.stock.unit_selling_price,
+      id: props.stock.id,
+      submitted: false,
     };
   }
 
-  onChange = (e, state)=>{
-    this.setState({[state]: e})
-  }
+  onChange = (e, state) => {
+    this.setState({ [state]: e });
+  };
 
   onSave = async () => {
     await toast.dismiss();
-      const {unit_selling_price} = this.state;
-      this.setState({submitted:true})
-    let check_price = unit_selling_price == '' || null  ? false : true;
-    console.log(check_price)
-    if(check_price){
-        this.savePrice()
-    } else{
+    const { unit_selling_price } = this.state;
+    this.setState({ submitted: true });
+    let check_price = unit_selling_price == "" || null ? false : true;
+    console.log(check_price);
+    if (check_price) {
+      this.savePrice();
+    } else {
       this.setState({ loading: false, saving: false });
     }
-
-  }
+  };
 
   savePrice = async () => {
     await toast.dismiss();
-    this.setState({saving: true });
-   
-    const { unit_selling_price, id} = this.state;
+    this.setState({ saving: true });
+
+    const { unit_selling_price, id } = this.state;
     this.setState({ saving: true });
     editPrice({
       unit_selling_price: unit_selling_price,
-      id:id
+      id: id,
     }).then(
       (res) => {
         this.setState({ loading: false, saving: false });
         this.showToast("Selling Price has been updated");
-        this.props.toggle()
+        this.props.toggle();
       },
       (error) => {
-        this.setState({ loading: false, saving:false });
+        this.setState({ loading: false, saving: false });
         alert("Please set selling price");
-        
       }
     );
   };
@@ -75,28 +72,23 @@ export class EditPrice extends Component {
     toast(<div style={{ padding: 20, color: "green" }}>{msg}</div>);
   };
 
-
-
-
-
-
   render() {
     const { stock, toggle } = this.props;
 
     const { saving, submitted, unit_selling_price, loading } = this.state;
     return (
       <>
-         {saving && <SpinDiv text={"Saving..."} />}
-         {loading && <SpinDiv text={"loading..."} />}
+        {saving && <SpinDiv text={"Saving..."} />}
+        {loading && <SpinDiv text={"loading..."} />}
         <Modal
           className="modal-dialog modal-dialog-centered"
           isOpen={stock != null}
           toggle={() => !loading && !saving && toggle}
-           style={{ maxWidth:500 }}
+          style={{ maxWidth: 500 }}
         >
-            <div className="modal-header" style={{ padding: "1rem" }}>
-                <h5>Edit Stock Price</h5>
-            
+          <div className="modal-header" style={{ padding: "1rem" }}>
+            <h5>Edit Selling Price</h5>
+
             <button
               type="button"
               className="btn-close"
@@ -105,35 +97,41 @@ export class EditPrice extends Component {
             ></button>
           </div>
           <Row>
-              <Col md={12}>
-                  <Row>
-                      <Col md={2}></Col>
-                      <Col md={6}>
-                      <Col md={3}></Col>
-                      <Form.Group>
-                      <Form.Label>Stock Price</Form.Label>
-                      <Input 
-                        value={unit_selling_price}
-                        onChange={async (e) => {
-                            await this.onChange(e.target.value, "unit_selling_price");
-                          }}
-                      
-                      />
+            <Col md={12}>
+              <Row>
+                <Col md={2}></Col>
+                <Col md={6}>
+                  <Col md={3}></Col>
+                  <Form.Group>
+                    <Form.Label>Stock Price</Form.Label>
+                    <Input
+                      value={unit_selling_price}
+                      onChange={async (e) => {
+                        await this.onChange(
+                          e.target.value,
+                          "unit_selling_price"
+                        );
+                      }}
+                    />
                   </Form.Group>
                   {submitted && !unit_selling_price && (
                     <div style={{ color: "red" }}>stock is required</div>
-                )}
-                      </Col>
-                  </Row>
-              </Col>
+                  )}
+                </Col>
+              </Row>
+            </Col>
           </Row>
           <Row>
-                <Col md={8}></Col>
-              <Col md={3} style={{marginBottom:10}}>
-                <Button onClick={()=>{this.onSave()}}>
-                        Save 
-                </Button>
-              </Col>
+            <Col md={8}></Col>
+            <Col md={3} style={{ marginBottom: 10 }}>
+              <Button
+                onClick={() => {
+                  this.onSave();
+                }}
+              >
+                Save
+              </Button>
+            </Col>
           </Row>
         </Modal>
       </>

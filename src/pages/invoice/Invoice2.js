@@ -70,9 +70,28 @@ export class Invoice extends React.Component {
     return chunkedWords.join("<br/>");
   }
 
+  combineItems = (items) => {
+    return items.reduce((acc, item) => {
+      const existingItem = acc.find(
+        (i) => i.order.product_name === item.order.product_name
+      );
+
+      if (existingItem) {
+        // Combine quantities and total price for duplicate items
+        existingItem.qty_sold += item.qty_sold;
+        //existingItem.selling_price += item.selling_price * item.qty_sold;
+      } else {
+        // Add new item if it's not a duplicate
+        acc.push({ ...item });
+      }
+
+      return acc;
+    }, []);
+  };
+
   render() {
     const { invoice, company, items, pos_items } = this.props;
-    console.log(pos_items);
+    const combinedItems = this.combineItems(this.props.pos_items);
 
     return (
       <Card style={{ padding: "10px", width: "100%" }}>
@@ -168,14 +187,12 @@ export class Invoice extends React.Component {
                     <td>{this.formatCurrency2(item.amount)}</td>
                   </tr>
                 ))}
-                {pos_items.map((item, key) => (
+                {combinedItems.map((item, key) => (
                   <tr key={key}>
                     <td
                       dangerouslySetInnerHTML={{
                         __html: this.formatProductName(
-                          item.order.product_name +
-                            " " +
-                            item.order.product_description
+                          item.order.product_name + " "
                         ),
                       }}
                     ></td>

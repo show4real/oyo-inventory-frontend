@@ -64,6 +64,10 @@ export class AddOrder extends Component {
       })),
       suppliers: [],
       supplier: 1,
+      // suppliers: props.suppliers.map((opt) => ({
+      //   label: opt.name,
+      //   value: opt.id,
+      // })),
       fromdate: moment().startOf("month"),
     };
   }

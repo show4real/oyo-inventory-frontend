@@ -607,7 +607,7 @@ export class PosOrderIndex extends Component {
 
           <Card border="light" className="shadow-sm mb-4">
             <Row>
-              <Col md={10}>
+              <Col md={8}>
                 <Row>
                   <Col md="5" className="">
                     <div style={{ display: "flex" }}>
@@ -687,7 +687,7 @@ export class PosOrderIndex extends Component {
                   </Col> */}
                 </Row>
               </Col>
-              <Col lg={2} style={{ color: "primary", paddingTop: "15px" }}>
+              <Col lg={4} style={{ color: "primary", paddingTop: "15px" }}>
                 <div className="btn-toolbar mb-2 mb-md-0">
                   <ButtonGroup>
                     {cartItem !== null ? (
@@ -715,6 +715,24 @@ export class PosOrderIndex extends Component {
                       >
                         View Sales
                       </Button>
+                    )}
+                    {cart_details.length > 0 ? (
+                      <ReactToPrint
+                        trigger={() => {
+                          return (
+                            <Button
+                              variant="outline-success"
+                              href="#"
+                              size="sm"
+                            >
+                              Print Invoice
+                            </Button>
+                          );
+                        }}
+                        content={() => this.componentRef}
+                      />
+                    ) : (
+                      ""
                     )}
                   </ButtonGroup>
                 </div>
@@ -879,24 +897,6 @@ export class PosOrderIndex extends Component {
                           >
                             Total: {this.totalCartP()}
                           </Button>
-                        ) : (
-                          ""
-                        )}
-                        {cart_details.length > 0 ? (
-                          <ReactToPrint
-                            trigger={() => {
-                              return (
-                                <Button
-                                  variant="outline-success"
-                                  href="#"
-                                  size="sm"
-                                >
-                                  Print Invoice
-                                </Button>
-                              );
-                            }}
-                            content={() => this.componentRef}
-                          />
                         ) : (
                           ""
                         )}

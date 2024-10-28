@@ -86,9 +86,49 @@ export class Invoice extends React.Component {
     return chunkedWords.join("<br/>");
   }
 
+  combineItems = (items) => {
+    return items.reduce((acc, item) => {
+      const existingItem = acc.find(
+        (i) => i.order.product_name === item.order.product_name
+      );
+
+      if (existingItem) {
+        // Combine quantities and total price for duplicate items
+        existingItem.qty_sold += item.qty_sold;
+        existingItem.selling_price += item.selling_price * item.qty_sold;
+      } else {
+        // Add new item if it's not a duplicate
+        acc.push({ ...item });
+      }
+
+      return acc;
+    }, []);
+  };
+
+  combineItems = (items) => {
+    return items.reduce((acc, item) => {
+      const existingItem = acc.find(
+        (i) => i.order.product_name === item.order.product_name
+      );
+
+      if (existingItem) {
+        // Combine quantities and total price for duplicate items
+        existingItem.qty_sold += item.qty_sold;
+        //existingItem.selling_price += item.selling_price * item.qty_sold;
+      } else {
+        // Add new item if it's not a duplicate
+        acc.push({ ...item });
+      }
+
+      return acc;
+    }, []);
+  };
+
   render() {
     const { invoice, user, previous_payment, pos_items, items, company } =
       this.props;
+
+    const combinedItems = this.combineItems(this.props.pos_items);
 
     return (
       <Card style={{ padding: "10px", width: "100%" }}>
@@ -176,14 +216,12 @@ export class Invoice extends React.Component {
                 </tr>
               </thead>
               <tbody style={{ fontWeight: 800, fontSize: "18px" }}>
-                {pos_items.map((item, key) => (
+                {combinedItems.map((item, key) => (
                   <tr key={key}>
                     <td
                       dangerouslySetInnerHTML={{
                         __html: this.formatProductName(
-                          item.order.product_name +
-                            " " +
-                            item.order.product_description
+                          item.order.product_name + " "
                         ),
                       }}
                     ></td>
@@ -211,17 +249,18 @@ export class Invoice extends React.Component {
               )}
             </div>
 
-            <div
+            {/* <div
               style={{
                 marginBottom: "10px",
                 fontWeight: 800,
                 padding: 10,
                 fontSize: "18px",
+                textTransform:'capitalize'
               }}
             >
               Amount in words:{" "}
               {this.getWords(invoice.amount) + ` ` + invoice.currency}
-            </div>
+            </div> */}
 
             <div
               style={{

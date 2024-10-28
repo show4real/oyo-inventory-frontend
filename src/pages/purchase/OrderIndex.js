@@ -556,7 +556,11 @@ export class StockIndex extends Component {
                   return (
                     <tr key={key} style={{ fontWeight: "bold" }}>
                       <td>{purchase_order.product_name}</td>
-                      <td>{purchase_order.supplier.name}</td>
+                      <td>
+                        {purchase_order.supplier !== null
+                          ? purchase_order.supplier.name
+                          : ""}
+                      </td>
                       <td>{purchase_order.tracking_id}</td>
                       <td>
                         {this.formatNumber(purchase_order.stock_quantity)}

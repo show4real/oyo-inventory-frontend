@@ -10,7 +10,7 @@ import {
 import { ChoosePhotoWidget, ProfileCardWidget } from "../../components/Widgets";
 import { getProduct, updateProduct } from "../../services/productService";
 import AttributeOptions from "./AttributeOptions";
-import styles from "../../assets/css/image.module.css"
+import styles from "../../assets/css/image.module.css";
 import {
   getPurchaseOrders,
   addPurchaseorder,
@@ -66,17 +66,14 @@ export class SingleProduct extends Component {
       suppliers: [],
       validation: {},
       id: props.match.params.id,
-
     };
     this.fileChangedHandler = this.fileChangedHandler.bind(this);
   }
-
 
   componentDidMount() {
     this.getProduct();
     this.getPurchaseOrders();
   }
-
 
   fileChangedHandler(event) {
     var fileInput = false;
@@ -84,7 +81,7 @@ export class SingleProduct extends Component {
       fileInput = true;
       this.setState({
         imageType: event.target.files[0].type,
-        imageSize: event.target.files[0].size
+        imageSize: event.target.files[0].size,
       });
     }
     if (fileInput) {
@@ -110,7 +107,6 @@ export class SingleProduct extends Component {
       }
     }
   }
-
 
   toggleAddAttribute = () => {
     this.setState({ addAttributes: !this.state.addAttributes });
@@ -148,12 +144,11 @@ export class SingleProduct extends Component {
     this.setState({ loading: true });
     getPurchaseOrders(id).then(
       (res) => {
-        console.log(res)
+        console.log(res);
         this.setState({
           loading: false,
           purchase_orders: res.purchase_orders.data,
           initialPurchaseOrders: { ...res.purchase_orders.data },
-
         });
         console.log(this.state.purchase_orders);
       },
@@ -181,7 +176,7 @@ export class SingleProduct extends Component {
   validationRules = (field) => {
     // if (field === "brand_id") {
     //   return "Brand is required";
-    // } else 
+    // } else
     if (field === "name") {
       return "Product Name is required";
     } else if (field === "category_id") {
@@ -205,21 +200,18 @@ export class SingleProduct extends Component {
     toast(<div style={{ padding: 20, color: "success" }}>{msg}</div>);
   };
 
-
-
-
   onSaveImage = async (e) => {
     e.preventDefault();
     await toast.dismiss();
     const { newImage, imageType, imageSize, validation } = this.state;
-    console.log(imageSize)
-    console.log(imageType !== 'image/jpeg');
+    console.log(imageSize);
+    console.log(imageType !== "image/jpeg");
     await this.setState({
       validation: {
         ...validation,
         data: newImage !== undefined || newImage === null,
-        imageType: imageType === 'image/jpeg' || imageType === 'image/png',
-        imageSize: imageSize / 1024 / 1024 <= 4
+        imageType: imageType === "image/jpeg" || imageType === "image/png",
+        imageSize: imageSize / 1024 / 1024 <= 4,
       },
     });
     if (Object.values(this.state.validation).every(Boolean)) {
@@ -243,7 +235,6 @@ export class SingleProduct extends Component {
     }
   };
 
-
   saveImage = () => {
     this.setState({ savingImage: true });
 
@@ -251,7 +242,7 @@ export class SingleProduct extends Component {
     console.log(id);
     addPImage({
       data: newImage,
-      product_id: id
+      product_id: id,
     }).then(
       (res) => {
         console.log(res);
@@ -260,11 +251,12 @@ export class SingleProduct extends Component {
         toast.configure({ hideProgressBar: true, closeButton: false });
         toast(
           <div style={{ padding: "10px 20px" }}>
-            <p style={{ margin: 0, fontWeight: "bold", color: "green" }}>Image uploaded</p>
-
+            <p style={{ margin: 0, fontWeight: "bold", color: "green" }}>
+              Image uploaded
+            </p>
           </div>
         );
-        this.setState({ newImage: "", uploadImage: false })
+        this.setState({ newImage: "", uploadImage: false });
         this.getProduct();
       },
       (error) => {
@@ -272,8 +264,9 @@ export class SingleProduct extends Component {
         toast.configure({ hideProgressBar: true, closeButton: false });
         toast(
           <div style={{ padding: "10px 20px" }}>
-            <p style={{ margin: 0, fontWeight: "bold", color: "red" }}>*{error}</p>
-
+            <p style={{ margin: 0, fontWeight: "bold", color: "red" }}>
+              *{error}
+            </p>
           </div>
         );
         this.setState({ loading: false, savingImage: false });
@@ -286,14 +279,12 @@ export class SingleProduct extends Component {
       let attribute_keys = [];
       attributes = pd.split(",");
       attribute_keys = pd2.split(",");
-     
 
       return attributes.map((attrs, key) => {
-     
         return <td>{attrs}</td>;
       });
     } else {
-      return <td>No product variants</td>
+      return <td>No product variants</td>;
     }
   };
   onChange = (e, state) => {
@@ -303,15 +294,15 @@ export class SingleProduct extends Component {
 
   saveProduct = () => {
     this.setState({ loading: true });
-    const { product, id } = this.state
+    const { product, id } = this.state;
     const { category_id, description, name } = product;
-    this.setState({ saving: true })
+    this.setState({ saving: true });
     updateProduct({
       id: id,
       name: product.name,
       // brand_id: product.brand_id,
       category_id: product.category_id,
-      description: product.description
+      description: product.description,
     }).then(
       (res) => {
         console.log(res);
@@ -320,8 +311,9 @@ export class SingleProduct extends Component {
         toast.configure({ hideProgressBar: true, closeButton: false });
         toast(
           <div style={{ padding: "10px 20px" }}>
-            <p style={{ margin: 0, fontWeight: "bold", color: "green" }}>Product updated</p>
-
+            <p style={{ margin: 0, fontWeight: "bold", color: "green" }}>
+              Product updated
+            </p>
           </div>
         );
 
@@ -343,9 +335,9 @@ export class SingleProduct extends Component {
       validation: {
         ...validation,
         // brand_id: brand_id !== '',
-        category_id: category_id !== '',
-        name: name !== '',
-        description: description !== '',
+        category_id: category_id !== "",
+        name: name !== "",
+        description: description !== "",
       },
     });
     if (Object.values(this.state.validation).every(Boolean)) {
@@ -370,7 +362,6 @@ export class SingleProduct extends Component {
   };
 
   render() {
-
     const {
       product,
       purchase_orders,
@@ -408,8 +399,6 @@ export class SingleProduct extends Component {
         <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
           <div className="d-flex">
             <ButtonGroup>
-            
-
               {/* <Button variant="outline-primary" size="sm">
                 Export
               </Button> */}
@@ -423,22 +412,22 @@ export class SingleProduct extends Component {
               <Row>
                 <Col md={6}>
                   <ButtonGroup>
-                   
-
-                    <Button variant="outline-primary" size="sm"
-                      onClick={() => { this.props.history.push('/purchase_orders') }}>
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      onClick={() => {
+                        this.props.history.push("/purchase_orders");
+                      }}
+                    >
                       create purchased order
                     </Button>
                   </ButtonGroup>
-
                 </Col>
-
               </Row>
               <Table
                 responsive
                 className="table-centered table-nowrap rounded mb-0"
               >
-
                 <thead className="thead-light">
                   <tr>
                     <th className="border-0">Product</th>
@@ -447,9 +436,13 @@ export class SingleProduct extends Component {
                     <th className="border-0">Unit Cost Price</th>
                     <th className="border-0">Date</th>
 
-                    {attributes.length < 1 ? <th className="border-0">Variants</th> : attributes.map((attribute, key) => {
-                      return <th className="border-0">{attribute.name}</th>;
-                    })}
+                    {attributes.length < 1 ? (
+                      <th className="border-0">Variants</th>
+                    ) : (
+                      attributes.map((attribute, key) => {
+                        return <th className="border-0">{attribute.name}</th>;
+                      })
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -460,12 +453,14 @@ export class SingleProduct extends Component {
                         <td>{purchase_order.stock_quantity}</td>
                         <td>{purchase_order.in_stock}</td>
                         <td>{purchase_order.unit_price}</td>
-                        <td>{moment(purchase_order.created_at).format('MMM DD YYYY')}</td>
+                        <td>
+                          {moment(purchase_order.created_at).format(
+                            "MMM DD YYYY"
+                          )}
+                        </td>
                         {this.attributeCols(
                           JSON.parse(purchase_order.product_attributes),
-                          JSON.parse(purchase_order.product_attributes_keys),
-
-
+                          JSON.parse(purchase_order.product_attributes_keys)
                         )}
                       </tr>
                     );
@@ -476,13 +471,12 @@ export class SingleProduct extends Component {
           </Col>
           <Col xs={12} xl={7}>
             <Card border="light" className="bg-white shadow-sm mb-4">
-
-              {loading && <SpinDiv text={'Loading...'} />}
-              {saving && <SpinDiv text={'Saving...'} />}
+              {loading && <SpinDiv text={"Loading..."} />}
+              {saving && <SpinDiv text={"Saving..."} />}
 
               <Card.Body>
                 <Row>
-                  <Col className="text-right" md={12}>
+                  {/* <Col className="text-right" md={12}>
                     {product && (
                         <ButtonGroup>
                           <Button
@@ -503,7 +497,7 @@ export class SingleProduct extends Component {
             
                        
                     )}
-                  </Col>
+                  </Col> */}
                 </Row>
                 <h5 className="mb-4">Product Details</h5>
 
@@ -585,109 +579,137 @@ export class SingleProduct extends Component {
                         variant="primary"
                         type="submit"
                         disabled={saving}
-                        onClick={this.onUpdateProduct}>
+                        onClick={this.onUpdateProduct}
+                      >
                         Save
                       </Button>
                     </div>
                   )}
-
                 </Form>
                 <h5 className="mb-4">Product Variants</h5>
 
                 <Table
-                responsive
-                className="table-centered table-nowrap rounded mb-0"
-              >
-
-                <thead className="thead-light">
-                  <tr>
-                    <th className="border-0">Variants</th>
-                    <th className="border-0">Options</th>
-                
-                  </tr>
-                </thead>
-                <tbody>
-                  {attributes && attributes.map((p, key) => {
-                    return (
-                      <tr>
-                        <td>{p.name}</td>
-                        <td>{p.attributevalues.length !== 0 ?p.attributevalues.map((p, key)=>{
-                          return p.attribute_value+',';
-                        }): "No options yet"}</td>
-                        
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </Table>
+                  responsive
+                  className="table-centered table-nowrap rounded mb-0"
+                >
+                  <thead className="thead-light">
+                    <tr>
+                      <th className="border-0">Variants</th>
+                      <th className="border-0">Options</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {attributes &&
+                      attributes.map((p, key) => {
+                        return (
+                          <tr>
+                            <td>{p.name}</td>
+                            <td>
+                              {p.attributevalues.length !== 0
+                                ? p.attributevalues.map((p, key) => {
+                                    return p.attribute_value + ",";
+                                  })
+                                : "No options yet"}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </Table>
               </Card.Body>
             </Card>
-            <Row>
-
-            </Row>
-
+            <Row></Row>
           </Col>
 
           <Col xs={12} xl={5}>
             <Row>
-
               <Col xs={12}>
                 <Card border="light" className="bg-white shadow-sm mb-4">
-                  {loading && <SpinDiv text={'Loading...'} />}
-                  {savingImage && <SpinDiv text={'Saving...'} />}
+                  {loading && <SpinDiv text={"Loading..."} />}
+                  {savingImage && <SpinDiv text={"Saving..."} />}
                   <Card.Body>
                     <Row>
                       <h5>Product Image</h5>
                       <Col md={12}>
                         {product && (
                           <Button
-                            variant={uploadImage ? "outline-secondary" : "outline-primary"}
+                            variant={
+                              uploadImage
+                                ? "outline-secondary"
+                                : "outline-primary"
+                            }
                             onClick={this.toggleUploadImage}
                             style={{ marginBottom: 20 }}
                             size="sm"
                           >
-                            {uploadImage ? "cancel upload" : product.product_image !== null ?
-                              "change product image" : "upload product image"}
+                            {uploadImage
+                              ? "cancel upload"
+                              : product.product_image !== null
+                              ? "change product image"
+                              : "upload product image"}
                           </Button>
                         )}
-                        {uploadImage && (<div>
-
-                          <div style={{ fontFamily: 'sans-serif', textAlign: 'center', display: 'flex' }}>
-                            <label style={{
-                              border: "1px solid #ccc"
-                              , display: "inline-block", padding: "6px 12px", cursor: "pointer"
-                            }}>
-                              <input type="file" style={{ display: "none" }} onChange={this.fileChangedHandler} />
-                              <i className="fa fa-cloud-upload" /> Choose Image
-                            </label>
-
+                        {uploadImage && (
+                          <div>
+                            <div
+                              style={{
+                                fontFamily: "sans-serif",
+                                textAlign: "center",
+                                display: "flex",
+                              }}
+                            >
+                              <label
+                                style={{
+                                  border: "1px solid #ccc",
+                                  display: "inline-block",
+                                  padding: "6px 12px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <input
+                                  type="file"
+                                  style={{ display: "none" }}
+                                  onChange={this.fileChangedHandler}
+                                />
+                                <i className="fa fa-cloud-upload" /> Choose
+                                Image
+                              </label>
+                            </div>
+                            <img src={this.state.newImage} alt="" />
+                            <div className="mt-3">
+                              <Button
+                                variant="primary"
+                                type="submit"
+                                disabled={savingImage}
+                                onClick={this.onSaveImage}
+                              >
+                                upload
+                              </Button>
+                            </div>
                           </div>
-                          <img src={this.state.newImage} alt="" />
-                          <div className="mt-3">
-                            <Button
-                              variant="primary"
-                              type="submit"
-                              disabled={savingImage}
-                              onClick={this.onSaveImage}>
-                              upload
-                            </Button>
-                          </div>
-                        </div>)}
+                        )}
                         <Row>
                           <Col md={12}>
-                            {product.product_image !== null ? <img
-                              style={{ borderRadius: "5px", height: 300, width: 300, marginLeft: 10 }}
-                              src={product.product_image} /> : ''}
+                            {product.product_image !== null ? (
+                              <img
+                                style={{
+                                  borderRadius: "5px",
+                                  height: 300,
+                                  width: 300,
+                                  marginLeft: 10,
+                                }}
+                                src={product.product_image}
+                              />
+                            ) : (
+                              ""
+                            )}
                           </Col>
                         </Row>
                       </Col>
-
                     </Row>
-
                   </Card.Body>
                 </Card>
               </Col>
-
             </Row>
           </Col>
         </Row>
