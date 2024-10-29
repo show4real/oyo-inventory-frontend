@@ -146,9 +146,6 @@ export class Invoice extends React.Component {
               <div style={{ textAlign: "left" }}>
                 <span>
                   Date: {moment(invoice.issued_date).format("MMM DD YYYY")}
-                  {invoice.due_date === invoice.issued_date
-                    ? ""
-                    : `  Due:` + moment(invoice.due_date).format("MMM DD YYYY")}
                 </span>
                 <br />
                 Invoice #: {invoice.invoice_no}
@@ -158,7 +155,7 @@ export class Invoice extends React.Component {
 
               <div style={{ textAlign: "right" }}>
                 <span>
-                  {invoice.client.name}
+                  {/* {invoice.client.name} */}
                   <br />
                   {invoice.client.address}
                   <br />
@@ -172,13 +169,13 @@ export class Invoice extends React.Component {
             <Table striped bordered hover style={{ marginBottom: "10px" }}>
               <thead>
                 <tr>
-                  <th>Description</th>
-                  <th>Qty</th>
-                  <th>Rate</th>
-                  <th>Cost</th>
+                  <th style={{ fontSize: "18px" }}>Product</th>
+                  <th style={{ fontSize: "18px" }}>Qty</th>
+                  <th style={{ fontSize: "18px" }}>Price</th>
+                  <th style={{ fontSize: "18px" }}>Amount</th>
                 </tr>
               </thead>
-              <tbody style={{ fontWeight: 800, fontSize: "18px" }}>
+              <tbody style={{ fontWeight: 600, fontSize: "20px" }}>
                 {items.map((item, key) => (
                   <tr key={key}>
                     <td>{item.description}</td>
@@ -190,15 +187,18 @@ export class Invoice extends React.Component {
                 {combinedItems.map((item, key) => (
                   <tr key={key}>
                     <td
+                      style={{ fontSize: "18px" }}
                       dangerouslySetInnerHTML={{
                         __html: this.formatProductName(
                           item.order.product_name + " "
                         ),
                       }}
                     ></td>
-                    <td>{item.qty_sold}</td>
-                    <td>{this.formatCurrency2(item.selling_price)}</td>
-                    <td>
+                    <td style={{ fontSize: "18px" }}>{item.qty_sold}</td>
+                    <td style={{ fontSize: "18px" }}>
+                      {this.formatCurrency2(item.selling_price)}
+                    </td>
+                    <td style={{ fontSize: "18px" }}>
                       {this.formatCurrency2(item.selling_price * item.qty_sold)}
                     </td>
                   </tr>
@@ -206,12 +206,19 @@ export class Invoice extends React.Component {
               </tbody>
             </Table>
 
-            <div style={{ marginBottom: "10px", fontWeight: 800, padding: 15 }}>
+            <div
+              style={{
+                marginBottom: "10px",
+                fontWeight: 600,
+                padding: 15,
+                fontSize: "18px",
+              }}
+            >
               Total: {this.formatCurrency(invoice.currency, invoice.amount)}
               <br />
-              Paid:{" "}
+              {/* Paid:{" "}
               {this.formatCurrency(invoice.currency, invoice.total_payment)}
-              <br />
+              <br /> */}
               {invoice.total_balance > 0 && (
                 <>
                   Balance:{" "}
@@ -220,7 +227,7 @@ export class Invoice extends React.Component {
               )}
             </div>
 
-            <div
+            {/* <div
               style={{
                 marginBottom: "10px",
                 fontWeight: 800,
@@ -230,7 +237,7 @@ export class Invoice extends React.Component {
             >
               Amount in words:{" "}
               {this.getWords(invoice.amount) + ` ` + invoice.currency}
-            </div>
+            </div> */}
 
             <div
               style={{
@@ -243,7 +250,7 @@ export class Invoice extends React.Component {
               {company && company.invoice_footer_one}
             </div>
 
-            <div
+            {/* <div
               style={{
                 fontWeight: 700,
                 marginBottom: "10px",
@@ -252,7 +259,7 @@ export class Invoice extends React.Component {
               }}
             >
               Terms and Conditions!
-            </div>
+            </div> */}
 
             <div
               style={{ marginBottom: "10px", padding: 15, fontSize: "18px" }}

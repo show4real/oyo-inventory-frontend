@@ -181,10 +181,10 @@ export class Invoice extends React.Component {
                     <span>
                       Date:{moment(invoice.issued_date).format("MMM DD YYYY")}
                       <br />
-                      {invoice.due_date === invoice.issued_date
+                      {/* {invoice.due_date === invoice.issued_date
                         ? ""
                         : `  Due:` +
-                          moment(invoice.due_date).format("MMM DD YYYY")}
+                          moment(invoice.due_date).format("MMM DD YYYY")} */}
                       <br />
                     </span>
                     Invoice #:{invoice.invoice_no}
