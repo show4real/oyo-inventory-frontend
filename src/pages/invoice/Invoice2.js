@@ -1,23 +1,16 @@
 import React from "react";
-import { Row, Card, Table } from "@themesberg/react-bootstrap";
+import { Card, Table } from "@themesberg/react-bootstrap";
 import moment from "moment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEnvelope,
-  faGlobe,
-  faPhone,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPhone, faGlobe } from "@fortawesome/free-solid-svg-icons";
 import { toWords } from "../../services/numberWordService";
 
-export class Invoice extends React.Component {
+class Invoice extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      search: "",
       company: props.company,
       user: props.user,
-      loading: false,
-      saving: false,
     };
   }
 
@@ -27,47 +20,11 @@ export class Invoice extends React.Component {
 
   totalCost = () => {
     const { items } = this.props;
-    var total = 0;
-    for (let v = 0; v < items.length; v++) {
-      total += items[v].rate * items[v].quantity;
-    }
-    return total;
+    return items.reduce((total, item) => total + item.rate * item.quantity, 0);
   };
 
-  formatCurrency2(x) {
-    if (x !== null && x !== 0 && x !== undefined) {
-      const parts = x.toString().split(".");
-      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      return `${parts.join(".")}`;
-    }
-    return 0;
-  }
-
-  formatCurrency(y, x) {
-    if (x !== "null" && x !== "0") {
-      const parts = x.toString().split(".");
-      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      return `${y}${parts.join(".")}`;
-    }
-    return "0";
-  }
-
-  formatProductName(productName) {
-    const words = productName.split(" ");
-    const chunkedWords = [];
-    for (let i = 0; i < words.length; i += 3) {
-      chunkedWords.push(words.slice(i, i + 3).join(" "));
-    }
-    return chunkedWords.join("<br/>");
-  }
-
-  formatTitle(productName) {
-    const words = productName.split(" ");
-    const chunkedWords = [];
-    for (let i = 0; i < words.length; i += 5) {
-      chunkedWords.push(words.slice(i, i + 5).join(" "));
-    }
-    return chunkedWords.join("<br/>");
+  formatCurrency(x) {
+    return x.toLocaleString(undefined, { minimumFractionDigits: 2 });
   }
 
   combineItems = (items) => {
@@ -75,206 +32,98 @@ export class Invoice extends React.Component {
       const existingItem = acc.find(
         (i) => i.order.product_name === item.order.product_name
       );
-
       if (existingItem) {
-        // Combine quantities and total price for duplicate items
         existingItem.qty_sold += item.qty_sold;
-        //existingItem.selling_price += item.selling_price * item.qty_sold;
       } else {
-        // Add new item if it's not a duplicate
         acc.push({ ...item });
       }
-
       return acc;
     }, []);
   };
 
   render() {
     const { invoice, company, items, pos_items } = this.props;
-    const combinedItems = this.combineItems(this.props.pos_items);
+    const combinedItems = this.combineItems(pos_items);
 
     return (
-      <Card style={{ padding: "10px", width: "100%" }}>
+      <Card style={{ padding: "5px", width: "100%", fontSize: "14px" }}>
         {Object.keys(invoice).length !== 0 && (
           <div>
-            <header>
-              <div
-                style={{
-                  textAlign: "center",
-                  marginBottom: "10px",
-                  marginTop: "5px",
-                }}
-              >
-                {/* <img
-                  src={`${company && company.logo_url}`}
-                  width="100"
-                  alt="Company Logo"
-                /> */}
-                <h1 style={{ fontWeight: 600 }}>
-                  {company !== null ? company.name : ""}
-                </h1>
-              </div>
+            <header style={{ textAlign: "center", marginBottom: "5px" }}>
+              <h1 style={{ fontWeight: "bold" }}>{company?.name || ""}</h1>
             </header>
 
-            <div
-              style={{
-                marginBottom: "10px",
-                fontWeight: 800,
-                fontSize: "18px",
-                textAlign: "center",
-              }}
-            >
+            <div style={{ textAlign: "center", marginBottom: "5px" }}>
               <div>
-                <FontAwesomeIcon icon={faPhone} /> {company.phone_one}, &nbsp;
-                {company.phone_two}
+                <FontAwesomeIcon icon={faPhone} /> {company?.phone_one}
               </div>
               <div>
-                <FontAwesomeIcon icon={faGlobe} />
-                &nbsp;{company.website}
+                <FontAwesomeIcon icon={faGlobe} /> {company?.website}
               </div>
             </div>
 
-            <div
-              style={{
-                marginBottom: "10px",
-                display: "flex",
-                padding: 15,
-                justifyContent: "space-between",
-                fontSize: "18px",
-              }}
-            >
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
               <div style={{ textAlign: "left" }}>
-                <span>
-                  Date: {moment(invoice.issued_date).format("MMM DD YYYY")}
-                </span>
+                Date: {moment(invoice.issued_date).format("MMM DD YYYY")}
                 <br />
                 Invoice #: {invoice.invoice_no}
                 <br />
-                {company && company.address}
+                {company?.address}
               </div>
 
               <div style={{ textAlign: "right" }}>
-                <span>
-                  {/* {invoice.client.name} */}
-                  <br />
-                  {invoice.client.address}
-                  <br />
-                  {invoice.client.phone}
-                  <br />
-                  {invoice.client.email !== "" ? invoice.client.email : ""}
-                </span>
+                {invoice.client?.address}
+                <br />
+                {invoice.client?.phone}
+                <br />
+                {invoice.client?.email || ""}
               </div>
             </div>
 
-            <Table striped bordered hover style={{ marginBottom: "10px" }}>
+            <Table borderless size="sm" style={{ marginTop: "10px" }}>
               <thead>
                 <tr>
-                  <th style={{ fontSize: "18px" }}>Product</th>
-                  <th style={{ fontSize: "18px" }}>Qty</th>
-                  <th style={{ fontSize: "18px" }}>Price</th>
-                  <th style={{ fontSize: "18px" }}>Amount</th>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                  <th>Amount</th>
                 </tr>
               </thead>
-              <tbody style={{ fontWeight: 600, fontSize: "20px" }}>
-                {items.map((item, key) => (
-                  <tr key={key}>
+              <tbody>
+                {items.map((item, index) => (
+                  <tr key={index}>
                     <td>{item.description}</td>
                     <td>{item.quantity}</td>
-                    <td>{this.formatCurrency2(item.rate)}</td>
-                    <td>{this.formatCurrency2(item.amount)}</td>
+                    <td>{this.formatCurrency(item.rate)}</td>
+                    <td>{this.formatCurrency(item.amount)}</td>
                   </tr>
                 ))}
-                {combinedItems.map((item, key) => (
-                  <tr key={key}>
-                    <td
-                      style={{ fontSize: "18px" }}
-                      dangerouslySetInnerHTML={{
-                        __html: this.formatProductName(
-                          item.order.product_name + " "
-                        ),
-                      }}
-                    ></td>
-                    <td style={{ fontSize: "18px" }}>{item.qty_sold}</td>
-                    <td style={{ fontSize: "18px" }}>
-                      {this.formatCurrency2(item.selling_price)}
-                    </td>
-                    <td style={{ fontSize: "18px" }}>
-                      {this.formatCurrency2(item.selling_price * item.qty_sold)}
+                {combinedItems.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.order.product_name}</td>
+                    <td>{item.qty_sold}</td>
+                    <td>{this.formatCurrency(item.selling_price)}</td>
+                    <td>
+                      {this.formatCurrency(item.selling_price * item.qty_sold)}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </Table>
 
-            <div
-              style={{
-                marginBottom: "10px",
-                fontWeight: 600,
-                padding: 15,
-                fontSize: "18px",
-              }}
-            >
-              Total: {this.formatCurrency(invoice.currency, invoice.amount)}
-              <br />
-              {/* Paid:{" "}
-              {this.formatCurrency(invoice.currency, invoice.total_payment)}
-              <br /> */}
+            <div style={{ fontWeight: "bold", padding: "5px 0" }}>
+              Total: {this.formatCurrency(invoice.amount)}
               {invoice.total_balance > 0 && (
-                <>
-                  Balance:{" "}
-                  {this.formatCurrency(invoice.currency, invoice.total_balance)}
-                </>
+                <div>Balance: {this.formatCurrency(invoice.total_balance)}</div>
               )}
             </div>
 
-            {/* <div
-              style={{
-                marginBottom: "10px",
-                fontWeight: 800,
-                padding: 10,
-                fontSize: "18px",
-              }}
-            >
-              Amount in words:{" "}
-              {this.getWords(invoice.amount) + ` ` + invoice.currency}
-            </div> */}
-
-            <div
-              style={{
-                marginBottom: "10px",
-                fontWeight: 800,
-                padding: 10,
-                fontSize: "18px",
-              }}
-            >
-              {company && company.invoice_footer_one}
+            <div style={{ paddingTop: "5px", fontWeight: "bold" }}>
+              {company?.invoice_footer_one}
             </div>
+            <div>{company?.invoice_footer_two}</div>
 
-            {/* <div
-              style={{
-                fontWeight: 700,
-                marginBottom: "10px",
-                padding: 10,
-                fontSize: "18px",
-              }}
-            >
-              Terms and Conditions!
-            </div> */}
-
-            <div
-              style={{ marginBottom: "10px", padding: 15, fontSize: "18px" }}
-            >
-              {company && company.invoice_footer_two}
-            </div>
-
-            <div
-              style={{
-                marginBottom: "10px",
-                fontWeight: 700,
-                padding: 15,
-                fontSize: "18px",
-              }}
-            >
+            <div style={{ fontWeight: "bold", paddingTop: "5px" }}>
               Cashier: {invoice.cashier_name}
             </div>
           </div>
