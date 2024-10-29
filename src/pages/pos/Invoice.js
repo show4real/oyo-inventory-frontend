@@ -212,7 +212,7 @@ export class Invoice extends React.Component {
                   <th style={{ fontSize: "18px" }}>Amount</th>
                 </tr>
               </thead>
-              <tbody style={{ fontWeight: 600, fontSize: "20px" }}>
+              <tbody style={{ fontWeight: 500, fontSize: "20px" }}>
                 {combinedItems.map((item, key) => (
                   <tr key={key}>
                     <td
@@ -235,7 +235,14 @@ export class Invoice extends React.Component {
               </tbody>
             </Table>
 
-            <div style={{ marginBottom: "10px", fontWeight: 600, padding: 15 }}>
+            <div
+              style={{
+                marginBottom: "10px",
+                fontWeight: 600,
+                padding: 15,
+                fontSize: "20px",
+              }}
+            >
               Total: {this.formatCurrency(invoice.currency, invoice.amount)}
               <br />
               {/* Paid:{" "}
@@ -264,7 +271,7 @@ export class Invoice extends React.Component {
 
             <div
               style={{
-                marginBottom: "10px",
+                marginBottom: "5px",
                 fontWeight: 800,
                 padding: 10,
                 fontSize: "18px",
@@ -273,7 +280,7 @@ export class Invoice extends React.Component {
               {company && company.invoice_footer_one}
             </div>
 
-            <div
+            {/* <div
               style={{
                 fontWeight: 700,
                 marginBottom: "5px",
@@ -282,7 +289,7 @@ export class Invoice extends React.Component {
               }}
             >
               Terms and Conditions!
-            </div>
+            </div> */}
 
             <div
               style={{ marginBottom: "10px", padding: 15, fontSize: "18px" }}
