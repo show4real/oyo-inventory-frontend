@@ -836,7 +836,7 @@ export class EditInvoice extends Component {
               >
                 <Form.Label style={{ fontSize: 25 }}>ITEMS SECTION</Form.Label>
 
-                {items.length > 1
+                {items.length > 0
                   ? items.map((item, key) => (
                       <Col
                         md={12}

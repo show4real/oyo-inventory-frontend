@@ -93,7 +93,7 @@ export class Invoice extends React.Component {
                 <br />
                 {company.address}
               </div>
-              <div style={{ textAlign: "right" }}>
+              {/* <div style={{ textAlign: "right" }}>
                 <strong>Client:</strong> {invoice.client.name}
                 <br />
                 {invoice.client.address}
@@ -101,7 +101,7 @@ export class Invoice extends React.Component {
                 {invoice.client.phone}
                 <br />
                 {invoice.client.email || ""}
-              </div>
+              </div> */}
             </div>
 
             <Table
@@ -119,13 +119,27 @@ export class Invoice extends React.Component {
                 </tr>
               </thead>
               <tbody>
+                {items.map((item, index) => (
+                  <tr key={index}>
+                    <td style={{ fontSize: "20px" }}>{item.description}</td>
+                    <td style={{ fontSize: "20px" }}>{item.quantity}</td>
+                    <td style={{ fontSize: "20px" }}>
+                      {this.formatCurrency(item.rate)}
+                    </td>
+                    <td style={{ fontSize: "20px" }}>
+                      {this.formatCurrency(item.amount)}
+                    </td>
+                  </tr>
+                ))}
                 {combinedItems.map((item, index) => (
                   <tr key={index}>
                     <td style={{ fontSize: "20px" }}>
                       {item.order.product_name}
                     </td>
                     <td style={{ fontSize: "20px" }}>{item.qty_sold}</td>
-                    <td>{this.formatCurrency(item.selling_price)}</td>
+                    <td style={{ fontSize: "20px" }}>
+                      {this.formatCurrency(item.selling_price)}
+                    </td>
                     <td style={{ fontSize: "20px" }}>
                       {this.formatCurrency(item.selling_price * item.qty_sold)}
                     </td>

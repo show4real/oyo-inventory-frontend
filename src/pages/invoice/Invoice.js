@@ -447,7 +447,7 @@ export class Invoice extends React.Component {
             >
               <strong>{company && company.invoice_footer_one}</strong>
             </div>
-            <div
+            {/* <div
               style={{
                 fontWeight: 700,
                 paddingLeft: 5,
@@ -458,7 +458,7 @@ export class Invoice extends React.Component {
               }}
             >
               Terms and Condition!
-            </div>
+            </div> */}
             <div
               style={{
                 fontWeight: 800,
