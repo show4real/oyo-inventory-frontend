@@ -98,9 +98,9 @@ export class Invoice extends React.Component {
         {Object.keys(invoice).length !== 0 && (
           <body>
             <header>
-              <div class="logo" style={{ fontWeight: 600, color: "black" }}>
+              {/* <div class="logo" style={{ fontWeight: 600, color: "black" }}>
                 <img width={100} src={`${company && company.logo_url}`} />
-              </div>
+              </div> */}
               <h1
                 style={{
                   fontWeight: 600,

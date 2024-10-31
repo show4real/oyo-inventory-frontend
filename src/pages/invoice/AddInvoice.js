@@ -115,7 +115,7 @@ export class AddInvoice extends Component {
       issue_date: moment().startOf("month"),
       due_date: moment().startOf("month"),
       clients: [],
-      currencies: "NGN",
+      currencies: currencies,
       invoice_last_id: "",
       submitted: false,
       invalidItems: [],
@@ -695,7 +695,7 @@ export class AddInvoice extends Component {
                     </Form.Group>
                   </Col>
                 </Row>
-                {/* <Row
+                <Row
                   style={{
                     border: "1px #eee solid",
                     padding: "10px 5px 0px",
@@ -720,7 +720,7 @@ export class AddInvoice extends Component {
                       </InputGroup>
                     </Form.Group>
                   </Col>
-                </Row> */}
+                </Row>
               </Col>
             </Row>
             <Row
@@ -875,7 +875,30 @@ export class AddInvoice extends Component {
                 </Col>
               ))}
               <Row>
-                <Col md={8}></Col>
+                <Col md={4}></Col>
+                <Col md={4} style={{ marginBottom: 20 }}>
+                  <Form.Group className="mb-2">
+                    <Form.Label>Currency</Form.Label>
+
+                    <Form.Select
+                      onChange={async (e) => {
+                        await this.onChange(e.target.value, "currency");
+                      }}
+                      style={{
+                        marginRight: 10,
+                        width: "100%",
+                      }}
+                    >
+                      <option value="">Select Currency</option>
+                      {currencies.length == 0 && ""}
+                      {currencies.map((p, index) => (
+                        <option value={p.abbrev} key={p}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
                 <Col md={4} style={{ marginBottom: 20 }}>
                   <Form.Group className="mb-2">
                     <Form.Label>Amount Received</Form.Label>

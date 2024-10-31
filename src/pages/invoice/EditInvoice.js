@@ -825,7 +825,8 @@ export class EditInvoice extends Component {
                   </Row> */}
                 </Col>
               </Row>
-
+              {/* sudo rm -rf /var/lib/docker/overlay2/eec5ec505ef2d5ab9250a8a2dd06a83215af4c0fef159cbcf4f045678341d516
+              sudo umount -l /var/lib/docker/overlay2/eec5ec505ef2d5ab9250a8a2dd06a83215af4c0fef159cbcf4f045678341d516/merged */}
               <Row
                 style={{
                   border: "1px #eee solid",
