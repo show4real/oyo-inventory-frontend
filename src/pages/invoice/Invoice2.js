@@ -93,15 +93,15 @@ export class Invoice extends React.Component {
                 <br />
                 {company.address}
               </div>
-              {/* <div style={{ textAlign: "right" }}>
+              <div style={{ textAlign: "right" }}>
                 <strong>Client:</strong> {invoice.client.name}
-                <br />
-                {invoice.client.address}
                 <br />
                 {invoice.client.phone}
                 <br />
+                {invoice.client.address}
+                <br />
                 {invoice.client.email || ""}
-              </div> */}
+              </div>
             </div>
 
             <Table
@@ -121,7 +121,11 @@ export class Invoice extends React.Component {
               <tbody>
                 {items.map((item, index) => (
                   <tr key={index}>
-                    <td style={{ fontSize: "20px" }}>{item.description}</td>
+                    <td
+                      style={{ fontSize: "20px", textTransform: "uppercase" }}
+                    >
+                      {item.description}
+                    </td>
                     <td style={{ fontSize: "20px" }}>{item.quantity}</td>
                     <td style={{ fontSize: "20px" }}>
                       {this.formatCurrency(item.rate)}

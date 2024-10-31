@@ -27,7 +27,7 @@ import makeAnimated from "react-select/animated";
 import { getCompany } from "../../services/companyService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { getClients, getInvoiceId } from "../../services/invoiceService";
+import { getAllClients, getInvoiceId } from "../../services/invoiceService";
 import { AsyncPaginate } from "react-select-async-paginate";
 import AddClient from "../clients/AddClient";
 import moment from "moment";
@@ -65,7 +65,7 @@ export class PosOrderIndex extends Component {
       serials2: [],
       payment_mode: "",
       amount_paid: "",
-      client_id: 1,
+      client_id: "",
       total_purchase: 0,
       selectedSerials: [],
       cart_sold: JSON.parse(localStorage.getItem("cart_sold")),
@@ -89,17 +89,15 @@ export class PosOrderIndex extends Component {
     localStorage.removeItem("cart_details");
   }
 
-  getClients = (page, search) => {
+  getClients = (search) => {
     const { rows } = this.state;
-    getClients({ rows, page, search }).then(
+    getAllClients({ search }).then(
       (res) => {
         this.setState({
-          clients: res.clients.data.map((opt) => ({
+          clients: res.clients.map((opt) => ({
             label: opt.name,
             value: opt.id,
           })),
-          currency: "",
-          amount_paid: 0,
         });
       },
       (error) => {
@@ -137,11 +135,10 @@ export class PosOrderIndex extends Component {
     async (search, loadedOptions, { page }) => {
       await this.getClients(page, search);
       console.log(data);
-      //const new_data = {data}
 
       return {
         options: data,
-        hasMore: data.length >= 10,
+        hasMore: data.length >= 10000,
         additional: {
           page: search ? 2 : page + 1,
         },
@@ -188,6 +185,7 @@ export class PosOrderIndex extends Component {
   incrementCount(item, index) {
     // index will be the key value
     const items = this.state.cartItem;
+    console.log(items);
     let inStock =
       item.stock_quantity - item.quantity_sold - item.quantity_returned;
     if (item.quantity < inStock) {
@@ -223,20 +221,10 @@ export class PosOrderIndex extends Component {
     const { cartItem, company, payment_mode, amount_paid, client_id } =
       this.state;
 
-    let check_serials =
-      cartItem.some((ele) => ele.quantity === 0) ||
-      cartItem.some((ele) => ele.quantity === undefined);
-
     toast.dismiss();
     toast.configure({ hideProgressBar: true, closeButton: false });
 
-    if (check_serials) {
-      if (company.sell_by_serial_no == 1) {
-        this.showToastError("Please Select serials");
-      } else {
-        this.showToastError("Please Select Quantity");
-      }
-    } else if (payment_mode == "") {
+    if (payment_mode == "") {
       this.showToastError("Please Add Payment Mode");
     } else if (client_id == "") {
       this.showToastError("Please Select a client");
@@ -462,30 +450,6 @@ export class PosOrderIndex extends Component {
     }
   };
 
-  attributeCols = (attribute_name, attribute_value) => {
-    if (attribute_name !== null) {
-      let attributes = new Array();
-      let values = new Array();
-      attributes = attribute_name.split(",");
-      values = attribute_value.split(",");
-      return values.map((attrs, key) => {
-        return (
-          <span
-            className="mb-0 text-sm"
-            style={{ textTransform: "capitalize" }}
-          >
-            <span style={{ fontWeight: "bold" }}>
-              {/* {attrs + ":" + "  "} */}
-            </span>
-            {attributes[key]}
-          </span>
-        );
-      });
-    } else {
-      return <p style={{ fontWeight: "bold" }}></p>;
-    }
-  };
-
   totalCart() {
     if (this.state.cartItem !== null) {
       let total_cart = this.state.cartItem.reduce(function (sum, item) {
@@ -516,33 +480,29 @@ export class PosOrderIndex extends Component {
     });
   };
 
+  handlePriceChange = (event, index) => {
+    const newPrice = parseFloat(event.target.value) || 0;
+    const updatedCartItems = [...this.state.cartItem];
+
+    updatedCartItems[index].order.unit_selling_price = newPrice;
+
+    this.setState({ cartItem: updatedCartItems });
+  };
+
   render() {
     const {
       stocks,
       company,
-      value,
       payment_mode,
-      order,
-      products,
       rows,
-      selectedSerials,
-      attributes,
-      showFilter,
       total,
       clients,
-      invoice_no,
       page,
-      cartCheckout,
-      close,
       cartItem,
       due_date,
       search,
-      loading,
-      addToCart,
       addClient,
       cart_details,
-      transaction_id,
-      sold_at,
       pos_items,
       invoice,
       user,
@@ -586,15 +546,6 @@ export class PosOrderIndex extends Component {
                     <Breadcrumb.Item href="#POS">POS</Breadcrumb.Item>
                   </Breadcrumb>
                 </div>
-                {/* <div className="btn-toolbar mb-2 mb-md-0">
-                <ButtonGroup>
-
-                  <Button variant="outline-primary" size="sm">
-                    Reprint Invoice
-                  </Button>
-
-                </ButtonGroup>
-              </div> */}
               </div>
             </Col>
           </Row>
@@ -625,66 +576,6 @@ export class PosOrderIndex extends Component {
                       />
                     </div>
                   </Col>
-                  {/* <Col lg="1">
-                    {!showFilter && (
-                      <div style={{ display: "flex" }}>
-                        <ButtonGroup>
-                          <Button
-                            color="warning"
-                            onClick={this.toggleFilter}
-                            size="sm"
-                            style={{ marginRight: 10 }}
-                          >
-                            Filter
-                          </Button>
-                        </ButtonGroup>
-                      </div>
-                    )}
-                  </Col>
-                  <Col md={4}>
-                    {showFilter && (
-                      <div
-                        style={{
-                          height: 50,
-                          borderTop: "0.5px solid #e9ecef",
-                          padding: "0 0 0 20px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          overflowX: "auto",
-                        }}
-                      >
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                          <span style={{ marginRight: 10, fontSize: 14 }}>
-                            Filter By product:{" "}
-                          </span>
-                          <Form.Select
-                            value={order}
-                            type="select"
-                            style={{ marginRight: 10, width: "fit-content" }}
-                            onChange={(e) =>
-                              this.onFilter(e.target.value, "order")
-                            }
-                          >
-                            <option value="">Select Product</option>
-                            {products.map((p, index) => (
-                              <option value={p.id} key={p}>
-                                {p.name}
-                              </option>
-                            ))}
-                          </Form.Select>
-                        </div>
-                        <Button
-                          color="warning"
-                          onClick={this.toggleFilter}
-                          size="sm"
-                          style={{ marginRight: 10 }}
-                        >
-                          Hide Filters
-                        </Button>
-                      </div>
-                    )}
-                  </Col> */}
                 </Row>
               </Col>
               <Col lg={4} style={{ color: "primary", paddingTop: "15px" }}>
@@ -770,43 +661,12 @@ export class PosOrderIndex extends Component {
                                   {stock.tracking}{" "}
                                 </span>
                               </td>
-                              <th scope="row">
-                                <td>
-                                  <Media className="align-items-center">
-                                    <a
-                                      className="avatar rounded-circle mr-3"
-                                      href="#p"
-                                      onClick={(e) => e.preventDefault()}
-                                    >
-                                      <img
-                                        style={{
-                                          maxHeight: 50,
-                                          maxWidth: 50,
-                                          borderRadius: 5,
-                                        }}
-                                        alt="..."
-                                        src={
-                                          (stock.product_image &&
-                                            stock.product_image.url) ||
-                                          ""
-                                        }
-                                      />
-                                    </a>
-                                    <span className="mb-0 text-sm">
-                                      {stock.product_name + " "}
-                                      {this.attributeCols(
-                                        JSON.parse(
-                                          stock.order.product_attributes
-                                        ),
-                                        JSON.parse(
-                                          stock.order.product_attributes_keys
-                                        )
-                                      )}
-                                    </span>
-                                    <span className="mb-0 text-sm"></span>
-                                  </Media>
-                                </td>
-                              </th>
+                              <td>
+                                <span className="mb-0 text-sm">
+                                  {stock.product_name + " "}
+                                </span>
+                              </td>
+
                               <td>
                                 {" "}
                                 <span style={{ fontWeight: "bold" }}>
@@ -823,7 +683,7 @@ export class PosOrderIndex extends Component {
                                 <span style={{ fontWeight: "bold" }}>
                                   {" "}
                                   {this.formatCurrency(
-                                    stock.order.unit_selling_price
+                                    stock.order.fixed_price
                                   )}{" "}
                                 </span>
                               </td>
@@ -911,11 +771,7 @@ export class PosOrderIndex extends Component {
                           <tr>
                             <th className="border-0">Product</th>
                             <th className="border-0">Price</th>
-                            <th className="border-0">
-                              {company.sell_by_serial_no == 1
-                                ? "Serial No"
-                                : "Quantity"}
-                            </th>
+                            <th className="border-0">Quantity</th>
                             <th className="border-0">Amount</th>
                           </tr>
                         </thead>
@@ -926,25 +782,6 @@ export class PosOrderIndex extends Component {
                               <tr>
                                 <td>
                                   <Media className="align-items-center">
-                                    <a
-                                      className="avatar rounded-circle mr-3"
-                                      href="#p"
-                                      onClick={(e) => e.preventDefault()}
-                                    >
-                                      <img
-                                        style={{
-                                          maxHeight: 50,
-                                          maxWidth: 50,
-                                          borderRadius: 5,
-                                        }}
-                                        alt="..."
-                                        src={
-                                          (sale.product_image &&
-                                            sale.product_image.url) ||
-                                          ""
-                                        }
-                                      />
-                                    </a>
                                     <span
                                       className="mb-0 text-sm"
                                       style={{
@@ -969,67 +806,87 @@ export class PosOrderIndex extends Component {
                                       <i className="fa fa-trash" />
                                     </Button>
                                   </Media>
-                                  <tr>
-                                    <td></td>
-                                  </tr>
                                 </td>
-                                <td>{sale.order.unit_selling_price}</td>
-                                {company.sell_by_serial_no == 1 ? (
-                                  <td
+
+                                <td>
+                                  {/* <InputNumber
                                     style={{
-                                      width: "500px",
-                                      marginBottom: "100px",
+                                      width: "auto",
+                                      height: 40,
+                                      paddingTop: 5,
+                                      borderRadius: 5,
+                                      fontSize: 18,
                                     }}
-                                  >
-                                    <Form.Group className="mb-2">
-                                      <Select
-                                        key={key}
-                                        maxMenuHeight={80}
-                                        width="408px"
-                                        onChange={this.handleInputChange(
-                                          sale,
-                                          key
-                                        )}
-                                        options={
-                                          sale.serials.map((opt) => ({
-                                            label: opt.serial_no,
-                                            value: opt.id,
-                                          })) || []
-                                        }
-                                        isMulti
-                                      />
-                                    </Form.Group>
-                                  </td>
-                                ) : (
-                                  <td>
-                                    {" "}
-                                    <div>
-                                      <Button
-                                        size="sm"
-                                        variant="outline-primary"
-                                        onClick={() =>
-                                          this.decrementCount(sale, key)
-                                        }
-                                      >
-                                        -
-                                      </Button>
+                                    value={sale.order.unit_selling_price}
+                                    formatter={(value) =>
+                                      `${value}`.replace(
+                                        /\B(?=(\d{3})+(?!\d))/g,
+                                        ","
+                                      )
+                                    }
+                                    parser={(value) =>
+                                      value.replace(/\$\s?|(,*)/g, "")
+                                    }
+                                    onKeyPress={(event) => {
+                                      if (!/[0-9]/.test(event.key)) {
+                                        event.preventDefault();
+                                      }
+                                    }}
+                                    onChange={(event) =>
+                                      this.handlePriceChange(event, key)
+                                    }
+                                  /> */}
+                                  <input
+                                    style={{
+                                      width: "auto",
+                                      height: 40,
+                                      paddingTop: 5,
+                                      borderRadius: 5,
+                                      fontSize: 18,
+                                    }}
+                                    onKeyPress={(event) => {
+                                      if (!/[0-9]/.test(event.key)) {
+                                        event.preventDefault();
+                                      }
+                                    }}
+                                    parser={(value) =>
+                                      value.replace(/\$\s?|(,*)/g, "")
+                                    }
+                                    value={sale.order.unit_selling_price}
+                                    onChange={(event) =>
+                                      this.handlePriceChange(event, key)
+                                    }
+                                  />
+                                </td>
+                                <td>
+                                  {" "}
+                                  <div>
+                                    <Button
+                                      size="sm"
+                                      variant="outline-primary"
+                                      onClick={() =>
+                                        this.decrementCount(sale, key)
+                                      }
+                                    >
+                                      -
+                                    </Button>
 
-                                      <span style={{ padding: "10px" }}>
-                                        {sale.quantity}
-                                      </span>
+                                    <span style={{ padding: "10px" }}>
+                                      {sale.quantity}
+                                    </span>
 
-                                      <Button
-                                        size="sm"
-                                        variant="outline-primary"
-                                        onClick={() =>
-                                          this.incrementCount(sale, key)
-                                        }
-                                      >
-                                        +
-                                      </Button>
-                                    </div>
-                                  </td>
-                                )}
+                                    <Button
+                                      size="sm"
+                                      variant="outline-primary"
+                                      onClick={() =>
+                                        this.incrementCount(sale, key)
+                                      }
+                                    >
+                                      +
+                                    </Button>
+                                  </div>
+                                </td>
+
                                 <td>
                                   {sale.quantity *
                                     sale.order.unit_selling_price}
@@ -1041,7 +898,7 @@ export class PosOrderIndex extends Component {
                       </Table>
                       <Table style={{ border: "none" }}>
                         <tr>
-                          {/* <Row
+                          <Row
                             style={{
                               border: "1px #eee solid",
                               padding: "10px 5px 0px",
@@ -1073,7 +930,7 @@ export class PosOrderIndex extends Component {
                                 </Button>
                               </ButtonGroup>
                             </Col>
-                          </Row> */}
+                          </Row>
                         </tr>
                         <tr>
                           {cartItem.length > 0 && (

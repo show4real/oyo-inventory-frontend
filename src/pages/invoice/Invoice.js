@@ -225,7 +225,7 @@ export class Invoice extends React.Component {
                       fontWeight: 700,
                     }}
                   >
-                    Description
+                    PRODUCT
                   </th>
                   <th
                     class="heading qty"
@@ -238,7 +238,7 @@ export class Invoice extends React.Component {
                       fontWeight: 700,
                     }}
                   >
-                    Qty
+                    QTY
                   </th>
                   <th
                     class="heading rate"
@@ -251,7 +251,7 @@ export class Invoice extends React.Component {
                       fontWeight: 700,
                     }}
                   >
-                    Rate
+                    PRICE
                   </th>
                   <th
                     class="heading amount"
@@ -264,7 +264,7 @@ export class Invoice extends React.Component {
                       fontWeight: 700,
                     }}
                   >
-                    Cost
+                    AMOUNT
                   </th>
                 </tr>
               </thead>
@@ -288,6 +288,7 @@ export class Invoice extends React.Component {
                                 fontSize: 18,
                                 width: "50mm",
                                 lineHeight: 1.5,
+                                textTransform: "uppercase",
                               }}
                             >
                               {item.description}

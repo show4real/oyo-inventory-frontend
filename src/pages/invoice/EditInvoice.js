@@ -669,7 +669,7 @@ export class EditInvoice extends Component {
                         />
                       </FormGroup>
                     </Col>
-                    <Col md={3}>
+                    {/* <Col md={3}>
                       <Form.Group className="mb-2">
                         <Form.Label>Currency</Form.Label>
 
@@ -693,7 +693,7 @@ export class EditInvoice extends Component {
                           ))}
                         </Form.Select>
                       </Form.Group>
-                    </Col>
+                    </Col> */}
                     <Col md={3}>
                       <Form.Group className="mb-2">
                         <Form.Label>Clients</Form.Label>
@@ -779,7 +779,7 @@ export class EditInvoice extends Component {
                                 event.preventDefault();
                               }
                             }}
-                            disabled={!edit}
+                            disabled
                             value={invoice.total_payment}
                             onChange={(e) => this.onChange(e, "amount_paid")}
                           />
@@ -793,7 +793,7 @@ export class EditInvoice extends Component {
                       </Form.Group>
                     </Col>
                   </Row>
-                  <Row
+                  {/* <Row
                     style={{
                       border: "1px #eee solid",
                       padding: "10px 5px 0px",
@@ -822,7 +822,7 @@ export class EditInvoice extends Component {
                         </InputGroup>
                       </Form.Group>
                     </Col>
-                  </Row>
+                  </Row> */}
                 </Col>
               </Row>
 

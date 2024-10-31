@@ -209,9 +209,10 @@ export class Invoice extends React.Component {
                     <span>
                       {invoice.client.name}
                       <br />
-                      {invoice.client.address}
-                      <br />
+
                       {invoice.client.phone}
+                      <br />
+                      {invoice.client.address}
                       <br />
                       {invoice.client.email !== "" ? invoice.client.email : ""}
                     </span>
@@ -237,7 +238,7 @@ export class Invoice extends React.Component {
                       fontWeight: 700,
                     }}
                   >
-                    Description
+                    PRODUCT
                   </th>
                   <th
                     class="heading qty"
@@ -250,7 +251,7 @@ export class Invoice extends React.Component {
                       fontWeight: 700,
                     }}
                   >
-                    Qty
+                    QTY
                   </th>
                   <th
                     class="heading rate"
@@ -263,7 +264,7 @@ export class Invoice extends React.Component {
                       fontWeight: 700,
                     }}
                   >
-                    Rate
+                    PRICE
                   </th>
                   <th
                     class="heading amount"
@@ -275,7 +276,7 @@ export class Invoice extends React.Component {
                       fontWeight: 700,
                     }}
                   >
-                    Cost
+                    AMOUNT
                   </th>
                 </tr>
               </thead>
@@ -294,6 +295,7 @@ export class Invoice extends React.Component {
                                 fontSize: 20,
                                 width: "80mm",
                                 lineHeight: 1.5,
+                                textTransform: "uppercase",
                               }}
                             >
                               {item.description}
