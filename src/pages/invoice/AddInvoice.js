@@ -390,7 +390,9 @@ export class AddInvoice extends Component {
         if (err) {
           toast.dismiss();
           toast.configure({ hideProgressBar: true, closeButton: false });
-          this.showToastError("An Invoice with this invoice No already exist");
+          this.showToastError(
+            "Network Error: Please check your Internet connection or refresh page"
+          );
 
           this.setState({ saving: false });
         }
