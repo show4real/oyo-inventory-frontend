@@ -457,7 +457,7 @@ export class InvoiceIndex extends Component {
               </span>
             </h5>
           </Col>
-          {/* <Col md={3}>
+          <Col md={3}>
             <ReactDatetime
               value={setFiltering === false ? fromdate : todate}
               dateFormat={"MMM D, YYYY"}
@@ -500,7 +500,7 @@ export class InvoiceIndex extends Component {
               timeFormat={false}
             />
             -
-          </Col> */}
+          </Col>
 
           <Col md="4" className="">
             <div style={{ display: "flex" }}>

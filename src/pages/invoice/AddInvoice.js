@@ -261,7 +261,7 @@ export class AddInvoice extends Component {
     } = this.state;
 
     this.setState({ submitted: true });
-    let check_payment = amount_paid > this.totalCost();
+    // let check_payment = amount_paid > this.totalCost();
     // let check_name = items.some(ele => ele.name === '');
     // let check_name_length = items.some(ele => ele.name.length > 24);
     let check_description = items.some((ele) => ele.item_description === "");
@@ -280,13 +280,12 @@ export class AddInvoice extends Component {
         due_date: due_date !== "",
         currency: currency !== "",
         issue_date: issue_date !== "",
-        amount_paid:
-          amount_paid !== 0 && amount_paid !== "" && amount_paid !== null,
+        amount_paid: amount_paid !== "" && amount_paid !== null,
       },
     });
     if (
       Object.values(this.state.validation).every(Boolean) &&
-      !check_payment &&
+      //   !check_payment &&
       !check_description &&
       !check_rate &&
       !check_quantity
@@ -923,12 +922,12 @@ export class AddInvoice extends Component {
                         }}
                         onChange={(e) => this.onChange(e, "amount_paid")}
                       />
-                      {submitted &&
+                      {/* {submitted &&
                         this.state.amount_paid > this.totalCost() && (
                           <div style={{ color: "red" }}>
                             Amount received is more than total Cost
                           </div>
-                        )}
+                        )} */}
                     </InputGroup>
                   </Form.Group>
                 </Col>
