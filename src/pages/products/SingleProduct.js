@@ -407,7 +407,7 @@ export class SingleProduct extends Component {
         </div>
 
         <Row>
-          <Col xs={12}>
+          {/* <Col xs={12}>
             <Card.Body className="bg-white shadow-sm mb-4">
               <Row>
                 <Col md={6}>
@@ -468,7 +468,7 @@ export class SingleProduct extends Component {
                 </tbody>
               </Table>
             </Card.Body>
-          </Col>
+          </Col> */}
           <Col xs={12} xl={7}>
             <Card border="light" className="bg-white shadow-sm mb-4">
               {loading && <SpinDiv text={"Loading..."} />}
@@ -476,28 +476,26 @@ export class SingleProduct extends Component {
 
               <Card.Body>
                 <Row>
-                  {/* <Col className="text-right" md={12}>
+                  <Col className="text-right" md={12}>
                     {product && (
-                        <ButtonGroup>
-                          <Button
+                      <ButtonGroup>
+                        {/* <Button
                        variant="outline-primary"
                        size="sm"
                        onClick={() => this.toggleAddAttribute()}
                      >
                        Add Product Variant
-                     </Button>
-                      <Button
-                        variant={editProduct ? "secondary" : "primary"}
-                        onClick={this.toggleEditProduct}
-                        size="sm"
-                      >
-                        {editProduct ? "Discard Changes" : "Edit Product"}
-                      </Button>
-                        </ButtonGroup>
-            
-                       
+                     </Button> */}
+                        <Button
+                          variant={editProduct ? "secondary" : "primary"}
+                          onClick={this.toggleEditProduct}
+                          size="sm"
+                        >
+                          {editProduct ? "Discard Changes" : "Edit Product"}
+                        </Button>
+                      </ButtonGroup>
                     )}
-                  </Col> */}
+                  </Col>
                 </Row>
                 <h5 className="mb-4">Product Details</h5>
 
@@ -586,7 +584,7 @@ export class SingleProduct extends Component {
                     </div>
                   )}
                 </Form>
-                <h5 className="mb-4">Product Variants</h5>
+                {/* <h5 className="mb-4">Product Variants</h5>
 
                 <Table
                   responsive
@@ -615,7 +613,7 @@ export class SingleProduct extends Component {
                         );
                       })}
                   </tbody>
-                </Table>
+                </Table> */}
               </Card.Body>
             </Card>
             <Row></Row>
