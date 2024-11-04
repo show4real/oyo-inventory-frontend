@@ -66,14 +66,15 @@ export class Invoice extends React.Component {
                 textAlign: "center",
                 marginBottom: "10px",
                 fontSize: "24px",
+                fontWeight: "bold",
               }}
             >
               <h1 style={{ fontWeight: "bold" }}>{company?.name || ""}</h1>
-              <div>
+              <div style={{ fontWeight: "bold" }}>
                 <FontAwesomeIcon icon={faPhone} /> {company.phone_one},{" "}
                 {company.phone_two}
               </div>
-              <div>
+              <div style={{ fontWeight: "bold" }}>
                 <FontAwesomeIcon icon={faGlobe} /> {company.website}
               </div>
             </header>
@@ -84,16 +85,17 @@ export class Invoice extends React.Component {
                 justifyContent: "space-between",
                 fontSize: "20px",
                 marginBottom: "10px",
+                fontWeight: "bold",
               }}
             >
-              <div style={{ textAlign: "left" }}>
+              <div style={{ textAlign: "left", fontWeight: "bold" }}>
                 Date: {moment(invoice.issued_date).format("MMM DD YYYY")}
                 <br />
                 Invoice #: {invoice.invoice_no}
                 <br />
                 {company.address}
               </div>
-              <div style={{ textAlign: "right" }}>
+              <div style={{ textAlign: "right", fontWeight: "bold" }}>
                 <strong>Client:</strong> {invoice.client.name}
                 <br />
                 {invoice.client.phone}
@@ -112,10 +114,16 @@ export class Invoice extends React.Component {
             >
               <thead>
                 <tr>
-                  <th style={{ fontSize: "20px" }}>Product</th>
-                  <th style={{ fontSize: "20px" }}>Qty</th>
-                  <th style={{ fontSize: "20px" }}>Price</th>
-                  <th style={{ fontSize: "20px" }}>Amount</th>
+                  <th style={{ fontSize: "20px", fontWeight: "bold" }}>
+                    Product
+                  </th>
+                  <th style={{ fontSize: "20px", fontWeight: "bold" }}>Qty</th>
+                  <th style={{ fontSize: "20px", fontWeight: "bold" }}>
+                    Price
+                  </th>
+                  <th style={{ fontSize: "20px", fontWeight: "bold" }}>
+                    Amount
+                  </th>
                 </tr>
               </thead>
               <tbody>
