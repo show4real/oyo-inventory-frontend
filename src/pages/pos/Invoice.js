@@ -122,15 +122,21 @@ export class Invoice extends React.Component {
                 {combinedItems.map((item, index) => (
                   <tr key={index}>
                     <td
-                      style={{ fontSize: "20px", textTransform: "uppercase" }}
+                      style={{
+                        fontSize: "20px",
+                        textTransform: "uppercase",
+                        fontWeight: "bold",
+                      }}
                     >
                       {item.order.product_name}
                     </td>
-                    <td style={{ fontSize: "20px" }}>{item.qty_sold}</td>
-                    <td style={{ fontSize: "20px" }}>
+                    <td style={{ fontSize: "20px", fontWeight: "bold" }}>
+                      {item.qty_sold}
+                    </td>
+                    <td style={{ fontSize: "20px", fontWeight: "bold" }}>
                       {this.formatCurrency(item.selling_price)}
                     </td>
-                    <td style={{ fontSize: "20px" }}>
+                    <td style={{ fontSize: "20px", fontWeight: "bold" }}>
                       {this.formatCurrency(item.selling_price * item.qty_sold)}
                     </td>
                   </tr>
@@ -160,10 +166,15 @@ export class Invoice extends React.Component {
                 fontSize: "20px",
                 marginTop: "10px",
                 textAlign: "center",
+                fontWeight: "bold",
               }}
             >
-              <div>{company?.invoice_footer_one}</div>
-              <div>{company?.invoice_footer_two}</div>
+              <div style={{ fontWeight: "bold" }}>
+                {company?.invoice_footer_one}
+              </div>
+              <div style={{ fontWeight: "bold" }}>
+                {company?.invoice_footer_two}
+              </div>
               <div style={{ fontWeight: "bold", marginTop: "10px" }}>
                 Cashier: {invoice.cashier_name}
               </div>

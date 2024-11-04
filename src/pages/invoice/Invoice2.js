@@ -69,11 +69,11 @@ export class Invoice extends React.Component {
               }}
             >
               <h1 style={{ fontWeight: "bold" }}>{company?.name || ""}</h1>
-              <div>
+              <div style={{ fontWeight: "bold" }}>
                 <FontAwesomeIcon icon={faPhone} /> {company.phone_one},{" "}
                 {company.phone_two}
               </div>
-              <div>
+              <div style={{ fontWeight: "bold" }}>
                 <FontAwesomeIcon icon={faGlobe} /> {company.website}
               </div>
             </header>
@@ -86,7 +86,7 @@ export class Invoice extends React.Component {
                 marginBottom: "10px",
               }}
             >
-              <div style={{ textAlign: "left" }}>
+              <div style={{ textAlign: "left", fontWeight: "bold" }}>
                 Date: {moment(invoice.issued_date).format("MMM DD YYYY")}
                 <br />
                 Invoice #: {invoice.invoice_no}
@@ -112,39 +112,53 @@ export class Invoice extends React.Component {
             >
               <thead>
                 <tr>
-                  <th style={{ fontSize: "20px" }}>Product</th>
-                  <th style={{ fontSize: "20px" }}>Qty</th>
-                  <th style={{ fontSize: "20px" }}>Price</th>
-                  <th style={{ fontSize: "20px" }}>Amount</th>
+                  <th style={{ fontSize: "20px", fontWeight: "bold" }}>
+                    Product
+                  </th>
+                  <th style={{ fontSize: "20px", fontWeight: "bold" }}>Qty</th>
+                  <th style={{ fontSize: "20px", fontWeight: "bold" }}>
+                    Price
+                  </th>
+                  <th style={{ fontSize: "20px", fontWeight: "bold" }}>
+                    Amount
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, index) => (
                   <tr key={index}>
                     <td
-                      style={{ fontSize: "20px", textTransform: "uppercase" }}
+                      style={{
+                        fontSize: "20px",
+                        textTransform: "uppercase",
+                        fontWeight: "bold",
+                      }}
                     >
                       {item.description}
                     </td>
-                    <td style={{ fontSize: "20px" }}>{item.quantity}</td>
-                    <td style={{ fontSize: "20px" }}>
+                    <td style={{ fontSize: "20px", fontWeight: "bold" }}>
+                      {item.quantity}
+                    </td>
+                    <td style={{ fontSize: "20px", fontWeight: "bold" }}>
                       {this.formatCurrency(item.rate)}
                     </td>
-                    <td style={{ fontSize: "20px" }}>
+                    <td style={{ fontSize: "20px", fontWeight: "bold" }}>
                       {this.formatCurrency(item.amount)}
                     </td>
                   </tr>
                 ))}
                 {combinedItems.map((item, index) => (
                   <tr key={index}>
-                    <td style={{ fontSize: "20px" }}>
+                    <td style={{ fontSize: "20px", fontWeight: "bold" }}>
                       {item.order.product_name}
                     </td>
-                    <td style={{ fontSize: "20px" }}>{item.qty_sold}</td>
-                    <td style={{ fontSize: "20px" }}>
+                    <td style={{ fontSize: "20px", fontWeight: "bold" }}>
+                      {item.qty_sold}
+                    </td>
+                    <td style={{ fontSize: "20px", fontWeight: "bold" }}>
                       {this.formatCurrency(item.selling_price)}
                     </td>
-                    <td style={{ fontSize: "20px" }}>
+                    <td style={{ fontSize: "20px", fontWeight: "bold" }}>
                       {this.formatCurrency(item.selling_price * item.qty_sold)}
                     </td>
                   </tr>
@@ -174,6 +188,7 @@ export class Invoice extends React.Component {
                 fontSize: "20px",
                 marginTop: "10px",
                 textAlign: "center",
+                fontWeight: "bold",
               }}
             >
               <div>{company?.invoice_footer_one}</div>
