@@ -24,6 +24,7 @@ export class EditPrice extends Component {
       saving: false,
       loading: false,
       unit_selling_price: props.stock.unit_selling_price,
+      unit_price: props.stock.unit_price,
       id: props.stock.id,
       submitted: false,
     };
@@ -35,11 +36,12 @@ export class EditPrice extends Component {
 
   onSave = async () => {
     await toast.dismiss();
-    const { unit_selling_price } = this.state;
+    const { unit_selling_price, unit_price } = this.state;
     this.setState({ submitted: true });
-    let check_price = unit_selling_price == "" || null ? false : true;
-    console.log(check_price);
-    if (check_price) {
+    let check_price = unit_price == "" || null ? false : true;
+    let check_selling_price = unit_selling_price == "" || null ? false : true;
+
+    if (check_price && check_selling_price) {
       this.savePrice();
     } else {
       this.setState({ loading: false, saving: false });
@@ -50,10 +52,11 @@ export class EditPrice extends Component {
     await toast.dismiss();
     this.setState({ saving: true });
 
-    const { unit_selling_price, id } = this.state;
+    const { unit_selling_price, unit_price, id } = this.state;
     this.setState({ saving: true });
     editPrice({
       unit_selling_price: unit_selling_price,
+      unit_price: unit_price,
       id: id,
     }).then(
       (res) => {
@@ -75,7 +78,8 @@ export class EditPrice extends Component {
   render() {
     const { stock, toggle } = this.props;
 
-    const { saving, submitted, unit_selling_price, loading } = this.state;
+    const { saving, submitted, unit_selling_price, unit_price, loading } =
+      this.state;
     return (
       <>
         {saving && <SpinDiv text={"Saving..."} />}
@@ -87,7 +91,7 @@ export class EditPrice extends Component {
           style={{ maxWidth: 500 }}
         >
           <div className="modal-header" style={{ padding: "1rem" }}>
-            <h5>Edit Selling Price</h5>
+            <h5>Edit Prices</h5>
 
             <button
               type="button"
@@ -98,12 +102,30 @@ export class EditPrice extends Component {
           </div>
           <Row>
             <Col md={12}>
+              <Row style={{ marginBottom: 10 }}>
+                <Col md={2}></Col>
+                <Col md={6}>
+                  <Col md={3}></Col>
+                  <Form.Group>
+                    <Form.Label>Cost Price</Form.Label>
+                    <Input
+                      value={unit_price}
+                      onChange={async (e) => {
+                        await this.onChange(e.target.value, "unit_price");
+                      }}
+                    />
+                  </Form.Group>
+                  {submitted && !unit_price && (
+                    <div style={{ color: "red" }}>Cost Price is required</div>
+                  )}
+                </Col>
+              </Row>
               <Row>
                 <Col md={2}></Col>
                 <Col md={6}>
                   <Col md={3}></Col>
                   <Form.Group>
-                    <Form.Label>Stock Price</Form.Label>
+                    <Form.Label>Selling Price</Form.Label>
                     <Input
                       value={unit_selling_price}
                       onChange={async (e) => {

@@ -995,7 +995,7 @@ export class Order extends Component {
                                       this.toggleChangePrice(stock)
                                     }
                                   >
-                                    Edit Price
+                                    Edit Prices
                                   </Button>
                                 )}
                               </td>
@@ -1091,6 +1091,8 @@ export class Order extends Component {
                                 <tr>
                                   <td>
                                     {stock.status == "Confirmed" &&
+                                      stock.stock_quantity !==
+                                        stock.quantity_moved &&
                                       company.sell_by_serial_no !== 1 && (
                                         <Button
                                           variant="outline-primary"
