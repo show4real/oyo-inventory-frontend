@@ -65,6 +65,7 @@ export class EditInvoice extends Component {
       pos_items: [],
       payments: [],
       total_amount: 0,
+      total_balance: 0,
       previous_payment: 0,
       balance: 0,
       english_ordinal_rules: new Intl.PluralRules("en", { type: "ordinal" }),
@@ -329,6 +330,7 @@ export class EditInvoice extends Component {
           payments: res.payments,
           items: res.items,
           pos_items: res.pos_items,
+          total_balance: res.total_balance,
           loading: false,
           edit: false,
         });
@@ -403,6 +405,7 @@ export class EditInvoice extends Component {
       loading,
       invoice,
       show,
+      total_balance,
     } = this.state;
     return (
       <>
@@ -417,6 +420,7 @@ export class EditInvoice extends Component {
               invoice={invoice}
               company={company}
               user={user}
+              total_balance={total_balance}
               //previous_payment={payments.map(payment => payment.amount_paid).reduce((prev, curr) => prev + curr, 0)}
               ref={(el) => (this.componentRef = el)}
               toggle={() => this.setState({ invoice: [] })}
@@ -432,6 +436,7 @@ export class EditInvoice extends Component {
               invoice={invoice}
               company={company}
               user={user}
+              total_balance={total_balance}
               //previous_payment={payments.map(payment => payment.amount_paid).reduce((prev, curr) => prev + curr, 0)}
               ref={(el) => (this.componentRef2 = el)}
               toggle={() => this.setState({ invoice: [] })}

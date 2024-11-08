@@ -21,13 +21,7 @@ import {
 
 import * as XLSX from "xlsx";
 import SpinDiv from "../components/SpinDiv";
-import axios from "axios";
-import settings from "../../services/settings";
-import { authHeader } from "../../services/authHeader";
-import { authService } from "../../services/authService";
-import { counter } from "@fortawesome/fontawesome-svg-core";
-import { Cart } from "../products/Cart";
-import AsyncSelect from "react-select/async";
+
 import AddOrder from "./AddOrder";
 import EditOrder from "./EditOrder";
 import moment from "moment";
@@ -95,8 +89,8 @@ export class StockIndex extends Component {
           loading: false,
           purchase_orders: res.purchase_orders.data,
           attributes: res.attributes,
-          products: res.products,
-          p: res.products.map((opt) => ({ label: opt.name, value: opt.id })),
+          // products: res.products,
+          // p: res.products.map((opt) => ({ label: opt.name, value: opt.id })),
           suppliers: res.suppliers,
           branches: res.branches,
           total: res.purchase_orders.total,
@@ -426,7 +420,7 @@ export class StockIndex extends Component {
               </Col>
             </Row>
           </Col>
-          <Col lg="1">
+          {/* <Col lg="1">
             {!showFilter && (
               <div style={{ display: "flex" }}>
                 <Button
@@ -441,7 +435,7 @@ export class StockIndex extends Component {
                 </Button>
               </div>
             )}
-          </Col>
+          </Col> */}
           <Col lg="4" className="">
             <div style={{ display: "flex" }}>
               <Input
@@ -473,7 +467,7 @@ export class StockIndex extends Component {
           </Col>
         </Row>
         <Row>
-          {showFilter && (
+          {/* {showFilter && (
             <Col md={12}>
               <Row>
                 <Col md={4}>
@@ -513,7 +507,7 @@ export class StockIndex extends Component {
                 </Col>
               </Row>
             </Col>
-          )}
+          )} */}
         </Row>
 
         <Card border="light" className="shadow-sm mb-4">

@@ -1,49 +1,21 @@
 import React, { Component } from "react";
 
-import {
-  Col,
-  Row,
-  Nav,
-  Card,
-  Table,
-  Form,
-  ButtonGroup,
-  Breadcrumb,
-  InputGroup,
-  Dropdown,
-} from "@themesberg/react-bootstrap";
-import {
-  faEnvelope,
-  faPhone,
-  faLock,
-  faPencilAlt,
-  faAddressCard,
-  faTimes,
-} from "@fortawesome/free-solid-svg-icons";
+import { Col, Row, Card, Form } from "@themesberg/react-bootstrap";
 
-import { Button, InputNumber, Spin } from "antd";
-import AsyncSelect from "react-select/async";
-import Select from "react-select";
-import { AsyncPaginate } from "react-select-async-paginate";
+import { Button, InputNumber, Spin, Select } from "antd";
 
-import Profile3 from "../../assets/img/team/profile-picture-3.jpg";
 import SpinDiv from "../components/SpinDiv";
 import axios from "axios";
 import settings from "../../services/settings";
 import { authHeader } from "../../services/authHeader";
 import { authService } from "../../services/authService";
 import { toast } from "react-toastify";
-import { filterAttributes } from "../../services/purchaseOrderService";
-import { CardHeader, Media, Input, Modal } from "reactstrap";
-import AttributeOptions from "../products/AttributeOptions";
-import AddAttribute from "../products/AddAttribute";
-import CurrencyInput from "react-currency-input-field";
-import { formatCurrency } from "../../services/formatCurrencyService";
+import { Modal } from "reactstrap";
 import moment from "moment";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import AddSupplier from "../suppliers/AddSupplier";
-import { getSuppliers } from "../../services/supplierService";
+import { getProducts } from "../../services/productService";
+
+const { Option } = Select;
+
 export class AddOrder extends Component {
   constructor(props) {
     super(props);
@@ -58,10 +30,7 @@ export class AddOrder extends Component {
       tags: [],
       attributes: [],
       validation: {},
-      products: props.products.map((opt) => ({
-        label: opt.name,
-        value: opt.id,
-      })),
+      products: [],
       suppliers: [],
       supplier: 1,
       // suppliers: props.suppliers.map((opt) => ({
@@ -73,18 +42,34 @@ export class AddOrder extends Component {
   }
 
   componentDidMount() {
-    this.getSuppliers();
+    this.getProducts();
   }
 
-  getSuppliers = (page, search) => {
-    const { rows } = this.state;
-    getSuppliers({ rows, page, search }).then(
+  // getSuppliers = (page, search) => {
+  //   const { rows } = this.state;
+  //   getSuppliers({ rows, page, search }).then(
+  //     (res) => {
+  //       this.setState({
+  //         suppliers: res.suppliers.data.map((opt) => ({
+  //           label: opt.name,
+  //           value: opt.id,
+  //         })),
+  //       });
+  //     },
+  //     (error) => {
+  //       this.setState({ loading: false });
+  //     }
+  //   );
+  // };
+
+  getProducts = () => {
+    const { page, rows, search, products } = this.state;
+    this.setState({ loading: true });
+    getProducts({ page, rows, search }).then(
       (res) => {
         this.setState({
-          suppliers: res.suppliers.data.map((opt) => ({
-            label: opt.name,
-            value: opt.id,
-          })),
+          products: [...products, ...res.products.data],
+          loading: false,
         });
       },
       (error) => {
@@ -93,21 +78,25 @@ export class AddOrder extends Component {
     );
   };
 
-  toggleEdit = () => {
-    const { initialProduct } = this.state;
-    this.setState({ edit: !this.state.edit, stock: { ...initialProduct } });
+  handlePopupScroll = (e) => {
+    const { loading, hasMore } = this.state;
+
+    if (loading || !hasMore) return;
+
+    const { target } = e;
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      this.setState(
+        (prevState) => ({ page: prevState.page + 1 }),
+        () => this.getProducts()
+      );
+    }
   };
 
-  toggleAttributeValue = (addAttributeValue) => {
-    this.setState({ addAttributeValue });
-  };
-
-  toggleAddAttribute = () => {
-    this.setState({ addAttributes: !this.state.addAttributes });
-  };
-
-  toggleAddSupplier = () => {
-    this.setState({ addSupplier: !this.state.addSupplier });
+  // Handle search input
+  handleSearch = (value) => {
+    this.setState({ search: value, page: 1, products: [], hasMore: true }, () =>
+      this.getProducts()
+    );
   };
 
   validationRules = (field) => {
@@ -117,6 +106,8 @@ export class AddOrder extends Component {
       return "Unit price is required";
     } else if (field === "supplier") {
       return "supplier is required";
+    } else if (field === "product") {
+      return "product is required";
     }
   };
 
@@ -124,39 +115,19 @@ export class AddOrder extends Component {
     toast(<div style={{ padding: 20, color: "success" }}>{msg}</div>);
   };
 
-  filter = async () => {
-    this.setState({ filtering: true });
-    const { product_id } = this.state;
-    filterAttributes({ product_id }).then(
-      (res) => {
-        this.setState({
-          filtering: false,
-          attributes: res.attributes,
-        });
-      },
-      (error) => {
-        console.log(error);
-        this.setState({ filtering: false });
-      }
-    );
-  };
-
   onSaveStock = async (e) => {
     e.preventDefault();
+
     await toast.dismiss();
-    const {
-      stock_quantity,
-      unit_price,
-      supplier,
-      validation,
-      product_attributes_values,
-    } = this.state;
+    const { stock_quantity, unit_price, supplier, validation, product_id } =
+      this.state;
+    console.log(product_id);
     await this.setState({
       validation: {
         ...validation,
-        //product_attributes_values:product_attributes_values !== undefined && product_attributes_values.length !== 0,
         stock_quantity: stock_quantity !== "" && stock_quantity !== undefined,
         unit_price: unit_price !== "" && unit_price !== undefined,
+        product: product_id !== "",
         // supplier: supplier !== "" && supplier !== undefined,
       },
     });
@@ -184,31 +155,10 @@ export class AddOrder extends Component {
   saveStock = () => {
     this.setState({ saving: true });
 
-    const {
-      product_attributes_values,
-      unit_price,
-      stock_quantity,
-      supplier,
-      product,
-      product_id,
-    } = this.state;
+    const { unit_price, stock_quantity, supplier, product_id } = this.state;
 
-    let attribute_values = "";
-    let attribute_keys = "";
     let data = new FormData();
-    if (product_attributes_values !== undefined) {
-      for (let x in product_attributes_values) {
-        attribute_values += product_attributes_values[x] + ",";
-        let attribute_values_1 = attribute_values.slice(0, -1);
-        data.set("product_attributes", JSON.stringify(attribute_values_1));
-      }
-      let product_attribute_keys = Object.keys(product_attributes_values);
-      for (let x in product_attribute_keys) {
-        attribute_keys += product_attribute_keys[x] + ",";
-        let attribute_keys_1 = attribute_keys.slice(0, -1);
-        data.set("product_attributes_keys", JSON.stringify(attribute_keys_1));
-      }
-    }
+
     data.set("unit_price", unit_price);
     data.set("product_id", product_id);
     data.set("stock_quantity", stock_quantity);
@@ -247,114 +197,15 @@ export class AddOrder extends Component {
     this.setState({ [state]: e });
   };
 
-  filterProduct = (inputValue) => {
-    return this.state.products.filter((i) =>
-      i.label.toLowerCase().includes(inputValue.toLowerCase())
-    );
-  };
-
-  // filterSupplier = (inputValue) => {
-  //   return this.state.suppliers.filter((i) =>
-  //     i.label.toLowerCase().includes(inputValue.toLowerCase())
-  //   );
-  // };
-
-  // loadSuppliers = (inputValue, callback) => {
-  //   setTimeout(() => {
-  //     callback(this.filterSupplier(inputValue));
-  //   }, 1000);
-  // };
-
-  handleSupplierChange = async (supplier) => {
-    await this.setState({ supplier: supplier.value });
-  };
-
-  loadSuppliers =
-    (data) =>
-    async (search, loadedOptions, { page }) => {
-      await this.getSuppliers(page, search);
-      console.log(data);
-      //const new_data = {data}
-
-      return {
-        options: data,
-        hasMore: data.length >= 10,
-        additional: {
-          page: search ? 2 : page + 1,
-        },
-      };
-    };
-
-  loadOptions = (inputValue, callback) => {
-    setTimeout(() => {
-      callback(this.filterProduct(inputValue));
-    }, 1000);
-  };
-
-  onChange2 = (e, state) => {
-    this.setState({ [state]: e });
-  };
-
-  handleChange = (event) => {
-    const { value, name } = event.target;
-    const { product_attributes_values } = this.state;
-    this.setState({
-      product_attributes_values: {
-        ...product_attributes_values,
-        [name]: value,
-      },
-    });
-  };
-  handleInputChange = (newValue) => {
-    const inputValue = newValue.replace(/\W/g, "");
-    this.setState({ inputValue });
-    return inputValue;
+  onChange2 = (value) => {
+    this.setState({ product_id: value });
   };
 
   render() {
-    const { addStock, products, toggle } = this.props;
-    const {
-      loading,
-      suppliers,
-      edit,
-      fromdate,
-      product_id,
-      addAttributes,
-      addSupplier,
-      stock,
-      saving,
-      addAttributeValue,
-      attributes,
-      validation,
-      filtering,
-    } = this.state;
+    const { addStock, toggle } = this.props;
+    const { loading, products, addSupplier, saving } = this.state;
     return (
       <>
-        {addAttributeValue && (
-          <AttributeOptions
-            saved={this.filter}
-            addAttributeValue={addAttributeValue}
-            toggle={() => this.setState({ addAttributeValue: null })}
-          />
-        )}
-
-        {addAttributes && (
-          <AddAttribute
-            saved={this.filter}
-            product_id={product_id}
-            addAttributes={addAttributes}
-            toggle={() => this.setState({ addAttributes: null })}
-          />
-        )}
-
-        {addSupplier && (
-          <AddSupplier
-            saved={this.getSuppliers}
-            addSupplier={addSupplier}
-            toggle={() => this.setState({ addSupplier: null })}
-          />
-        )}
-
         <Modal
           className="modal-dialog modal-dialog-centered"
           isOpen={addStock != null}
@@ -382,102 +233,25 @@ export class AddOrder extends Component {
                     <Col md={8}>
                       <Form.Group className="mb-2">
                         <Form.Label>Select Product</Form.Label>
-                        <AsyncSelect
-                          cacheOptions
-                          defaultOptions
-                          disabled={filtering}
-                          loadOptions={this.loadOptions}
-                          onInputChange={this.handleInputChange}
-                          onChange={async (property, value) => {
-                            console.log(property);
-                            await this.setState({
-                              product_id: property.value,
-                              selectedTitle: property.label,
-                            });
-                            await this.filter();
-                          }}
-                        />
+                        <Select
+                          showSearch
+                          placeholder="Search products"
+                          filterOption={false}
+                          onSearch={this.handleSearch}
+                          onPopupScroll={this.handlePopupScroll}
+                          onChange={this.onChange2}
+                          notFoundContent={
+                            loading ? <Spin size="small" /> : null
+                          }
+                          style={{ width: "100%" }}
+                        >
+                          {products.map((product) => (
+                            <Option key={product.id} value={product.id}>
+                              {product.name}
+                            </Option>
+                          ))}
+                        </Select>
                       </Form.Group>
-                    </Col>
-                    {/* <Col md={4} style={{ paddingTop: 30 }}>
-                      <ButtonGroup>
-                        {product_id !== "" ? (
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            onClick={() => this.toggleAddAttribute()}
-                          >
-                            <FontAwesomeIcon icon={faPlus} />
-                            &nbsp;Create Product Varieties
-                          </Button>
-                        ) : (
-                          ""
-                        )}
-                      </ButtonGroup>
-                    </Col> */}
-                  </Row>
-                  <Row>
-                    <Col md={12}>
-                      <Row>
-                        {console.log(attributes)}
-                        {attributes.length > 0 && (
-                          <Form.Label>Variants</Form.Label>
-                        )}
-                        {filtering
-                          ? "loading..."
-                          : attributes.map((attribute, key) => {
-                              return (
-                                <Row>
-                                  <Col md={7} className="mb-3">
-                                    <Form.Group className="mb-2">
-                                      Select {attribute.name}
-                                      <Form.Select
-                                        id="state"
-                                        required
-                                        name={`${attribute.name}`}
-                                        onChange={this.handleChange}
-                                        style={{
-                                          marginRight: 10,
-                                          width: "100%",
-                                          color:
-                                            validation.product_attributes_values ===
-                                            false
-                                              ? "red"
-                                              : null,
-                                        }}
-                                      >
-                                        <option value="">
-                                          choose {attribute.name}{" "}
-                                        </option>
-                                        {attribute.attributevalues.map(
-                                          (p, index) => (
-                                            <option
-                                              value={p.attribute_value}
-                                              key={p}
-                                            >
-                                              {p.attribute_value}
-                                            </option>
-                                          )
-                                        )}
-                                      </Form.Select>
-                                    </Form.Group>
-                                  </Col>
-                                  <Col md={5}>
-                                    <Button
-                                      variant="outline-primary"
-                                      size="sm"
-                                      style={{ marginTop: "30px" }}
-                                      onClick={() =>
-                                        this.toggleAttributeValue(attribute)
-                                      }
-                                    >
-                                      Add Variant Options
-                                    </Button>
-                                  </Col>
-                                </Row>
-                              );
-                            })}
-                      </Row>
                     </Col>
                   </Row>
                 </Col>

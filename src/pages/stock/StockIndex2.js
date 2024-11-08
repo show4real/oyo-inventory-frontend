@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Input, Media } from "reactstrap";
-import {getStock} from "../../services/purchaseOrderService";
+import { getStock } from "../../services/purchaseOrderService";
 import { toast } from "react-toastify";
 import Cart from "../products/Cart";
 import {
@@ -19,7 +19,7 @@ import AddSales from "./AddSales";
 import EditStock from "./EditStock";
 import { Invoice } from "./Invoice";
 //import AddStock from "../products/AddStock";
-import { Pagination } from 'antd';
+import { Pagination } from "antd";
 
 export class StockIndex2 extends Component {
   constructor(props) {
@@ -31,18 +31,16 @@ export class StockIndex2 extends Component {
       loading: false,
       stocks: [],
       products: [],
-      total_cost:[],
+      total_cost: [],
       order: "",
-      value:"",
+      value: "",
       total: 0,
       total_cart: 0,
       cartItem: JSON.parse(localStorage.getItem("cart")),
-      options:[],
-      cart_sold:JSON.parse(localStorage.getItem("cart_sold")),
-      cart_details:JSON.parse(localStorage.getItem("cart_details"))
-     
+      options: [],
+      cart_sold: JSON.parse(localStorage.getItem("cart_sold")),
+      cart_details: JSON.parse(localStorage.getItem("cart_details")),
     };
-  
   }
 
   componentDidMount() {
@@ -51,16 +49,15 @@ export class StockIndex2 extends Component {
     localStorage.removeItem("cart_sold");
     localStorage.removeItem("cart_details");
     //this.setState({ cartCheckout:null });
-   
   }
-  clearCart(){
+  clearCart() {
     localStorage.removeItem("cart");
     localStorage.removeItem("cart_sold");
     localStorage.removeItem("cart_details");
-    this.setState({ cartItem:null });
-    this.setState({ cart_details:null });
-    this.setState({ cart_sold:null });
-    this.setState({ cartCheckout:null });
+    this.setState({ cartItem: null });
+    this.setState({ cart_details: null });
+    this.setState({ cart_sold: null });
+    this.setState({ cartCheckout: null });
     this.getPurchaseOrders();
   }
 
@@ -68,7 +65,6 @@ export class StockIndex2 extends Component {
     toast(<div style={{ padding: 20, color: "success" }}>{msg}</div>);
   };
   getPurchaseOrders = () => {
-
     const { page, rows, order, search, products } = this.state;
     console.log(order);
     this.setState({ loading: true });
@@ -80,79 +76,77 @@ export class StockIndex2 extends Component {
           stocks: res.stocks.data,
           attributes: res.attributes,
           products: res.products,
-          total_cost:res.total_stock,
-          suppliers:res.suppliers,
-          branches:res.branches,
+          total_cost: res.total_stock,
+          suppliers: res.suppliers,
+          branches: res.branches,
           total: res.stocks.total,
           initialPurchaseOrders: { ...res.stocks.data },
         });
       },
       (error) => {
-        this.setState({ loading: false, });
+        this.setState({ loading: false });
       }
     );
   };
   resetInput = (e) => {
     e.target.value = "";
-  }
-  
+  };
 
   toggleFilter = () => {
     this.setState({ showFilter: !this.state.showFilter });
   };
-  sleep = ms =>
-  new Promise(resolve => {
-    setTimeout(() => {
-      resolve();
-    }, ms);
-  });
+  sleep = (ms) =>
+    new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, ms);
+    });
 
   loadOptions = async (search, prevOptions) => {
-    options=[];
+    options = [];
     var options = this.state.products.map((product, key) => {
-        return ({
-            value:product.id,
-            label:product.name
-        });
-      });
+      return {
+        value: product.id,
+        label: product.name,
+      };
+    });
     await this.sleep(1000);
-  
+
     let filteredOptions;
     if (!search) {
       filteredOptions = options;
     } else {
       const searchLower = search.toLowerCase();
-  
+
       filteredOptions = options.filter(({ label }) =>
         label.toLowerCase().includes(searchLower)
       );
     }
-  
+
     const hasMore = filteredOptions.length > prevOptions.length + 10;
     const slicedOptions = filteredOptions.slice(
       prevOptions.length,
       prevOptions.length + 10
     );
-  
+
     return {
       options: slicedOptions,
-      hasMore
+      hasMore,
     };
   };
   handleChange = async (value) => {
-      console.log(value);
+    console.log(value);
     this.setState({
-      value:value,
-      order:value.value
-      
+      value: value,
+      order: value.value,
     });
     this.getPurchaseOrders();
   };
 
-  onPage = async (page,rows) => {
-    await this.setState({page,rows});
+  onPage = async (page, rows) => {
+    await this.setState({ page, rows });
     await this.getPurchaseOrders();
-  }
+  };
 
   onFilter = async (e, filter) => {
     console.log(filter);
@@ -178,7 +172,7 @@ export class StockIndex2 extends Component {
   inCart = (cartId) => {
     let inCartIds = this.state.cartItem;
 
-    if (inCartIds !== null && localStorage.getItem('cart') !== null) {
+    if (inCartIds !== null && localStorage.getItem("cart") !== null) {
       var result = inCartIds.map((product, key) => {
         return product.id;
       });
@@ -190,22 +184,22 @@ export class StockIndex2 extends Component {
     }
   };
 
-  attributeCols = (attribute_name,attribute_value) => {
-    if(attribute_name !== null){
+  attributeCols = (attribute_name, attribute_value) => {
+    if (attribute_name !== null) {
       let attributes = new Array();
-      let values=new Array();
+      let values = new Array();
       attributes = attribute_name.split(",");
-      values=attribute_value.split(",");
+      values = attribute_value.split(",");
       return values.map((attrs, key) => {
-        return <p className="mb-0 text-sm" style={{textTransform:"capitalize"}}>
-          <span style={{fontWeight:"bold"}}>
-            {attrs+":"+"  "}
-          </span>
+        return (
+          <p className="mb-0 text-sm" style={{ textTransform: "capitalize" }}>
+            <span style={{ fontWeight: "bold" }}>{attrs + ":" + "  "}</span>
             {attributes[key]}
-          </p>;
+          </p>
+        );
       });
-    }else{
-      return <p style={{fontWeight:"bold"}}>No variants</p>
+    } else {
+      return <p style={{ fontWeight: "bold" }}>No variants</p>;
     }
   };
 
@@ -221,22 +215,20 @@ export class StockIndex2 extends Component {
   }
 
   toggleCart = (cartCheckout) => {
-    
     this.setState({ cartCheckout });
-    
   };
 
   toggleAddStock = () => {
     this.setState({ addStock: !this.state.addStock });
   };
 
-  formatCurrency(x){
-    if(x!=='null' && x!=='0'){
+  formatCurrency(x) {
+    if (x !== "null" && x !== "0") {
       const parts = x.toString().split(".");
       parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       return `\u20a6${parts.join(".")}`;
     }
-    return '0';
+    return "0";
   }
 
   toggleAddSales = (addSales) => {
@@ -286,7 +278,7 @@ export class StockIndex2 extends Component {
     } = this.state;
     return (
       <>
-      {console.log(cartCheckout)}
+        {console.log(cartCheckout)}
         {addStock && (
           <AddStock
             saved={this.getPurchaseOrders}
@@ -307,8 +299,6 @@ export class StockIndex2 extends Component {
           />
         )}
 
-        
-
         {editStock && (
           <EditStock
             saved={this.getPurchaseOrders}
@@ -321,7 +311,6 @@ export class StockIndex2 extends Component {
         {cartCheckout && (
           <Cart
             saved={this.getPurchaseOrders}
-            
             cartCheckout={cartCheckout}
             toggle={() => this.setState({ cartCheckout: false })}
             //close={() => this.setState({cartItem})}
@@ -345,28 +334,24 @@ export class StockIndex2 extends Component {
               </div>
               <div className="btn-toolbar mb-2 mb-md-0">
                 <ButtonGroup>
-                  
-                  <Button variant="outline-primary" size="sm"  
-                  onClick={() => {this.props.history.push('/products')}}
-
+                  <Button
+                    variant="outline-primary"
+                    size="sm"
+                    onClick={() => {
+                      this.props.history.push("/products");
+                    }}
                   >
                     Products
                   </Button>
-
-                  
-                 
                 </ButtonGroup>
               </div>
             </div>
           </Col>
         </Row>
         <Row>
-        <div className="btn-toolbar mb-2 mb-md-0">
-           
-              </div>
+          <div className="btn-toolbar mb-2 mb-md-0"></div>
           <Col lg="7">
             <h6>Stocks({total})</h6>
-          
           </Col>
           <Col lg="1">
             {!showFilter && (
@@ -399,7 +384,6 @@ export class StockIndex2 extends Component {
                     });
                   }
                 }}
-                
               />
               <Button
                 className="btn-icon btn-2"
@@ -487,47 +471,58 @@ return <>{data && data.map((item, index) => <BarCodeItem key={index} barcodeValu
         <Card border="light" className="shadow-sm mb-4">
           <Row>
             <Col lg="10">
-                <div style={{fontSize:"18px",paddingTop:"20px",color:"red",
-                paddingLeft:"10px",fontWeight:"bold"}}>
+              <div
+                style={{
+                  fontSize: "18px",
+                  paddingTop: "20px",
+                  color: "red",
+                  paddingLeft: "10px",
+                  fontWeight: "bold",
+                }}
+              >
                 Total Stock Cost:&nbsp;&#8358;
                 {total_cost.map((total, key) => {
-                    return (total.total !== null ? total.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    : "----");
+                  return total.total !== null
+                    ? total.total
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : "----";
                 })}
-                </div> 
+              </div>
             </Col>
             <Col lg="2" style={{ color: "primary", paddingTop: "15px" }}>
               <div className="btn-toolbar mb-2 mb-md-0">
                 <ButtonGroup>
-                  {cartItem !== null ? <div>
+                  {cartItem !== null ? (
+                    <div>
+                      <Button
+                        variant="outline-success"
+                        onClick={() => this.toggleCart(cartItem)}
+                        size="sm"
+                      >
+                        Sales({cartItem.length})
+                      </Button>
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        onClick={() => {
+                          this.clearCart();
+                        }}
+                      >
+                        Clear Cart
+                      </Button>
+                    </div>
+                  ) : (
                     <Button
-                    variant="outline-success"
-                    onClick={() => this.toggleCart(cartItem)}
-                    size="sm"
-                  >
-                    
-                    Sales({cartItem.length})
-                  </Button>
-                   <Button variant="outline-primary" size="sm"  
-                   onClick={() => {this.clearCart()}}
- 
-                   >
-                     Clear Cart
-                   </Button>
-                  </div>
-                  :<Button
-                    variant="outline-success"
-                    onClick={() => {
-                      this.props.history.push('/sales_order')
-                    }}
-                    size="sm"
-                  >
-                
-                    View Sales
-                  </Button>}
-                
-                  
-                  
+                      variant="outline-success"
+                      onClick={() => {
+                        this.props.history.push("/sales_order");
+                      }}
+                      size="sm"
+                    >
+                      View Sales
+                    </Button>
+                  )}
                 </ButtonGroup>
               </div>
               {/*count(addToCart)*/}
@@ -555,121 +550,166 @@ return <>{data && data.map((item, index) => <BarCodeItem key={index} barcodeValu
                   return (
                     <tr key={key}>
                       <th scope="row">
-                        <td><Media className="align-items-center">
-                          <a
-                            className="avatar rounded-circle mr-3"
-                            href="#p"
-                            onClick={(e) => e.preventDefault()}
-                          >
-                            <img
-                              style={{
-                                maxHeight: 50,
-                                maxWidth: 50,
-                                borderRadius: 5,
-                              
-                              }}
-                              alt="..."
-                              src={
-                               stock.product_image !== null ? stock.product_image.url :
-                                require("../../assets/img/brand/coke.jpeg")
-                              }
-                            />
-                            
-                            
-                          </a>
-                          <span className="mb-0 text-sm" >
+                        <td>
+                          <Media className="align-items-center">
+                            <a
+                              className="avatar rounded-circle mr-3"
+                              href="#p"
+                              onClick={(e) => e.preventDefault()}
+                            >
+                              <img
+                                style={{
+                                  maxHeight: 50,
+                                  maxWidth: 50,
+                                  borderRadius: 5,
+                                }}
+                                alt="..."
+                                src={
+                                  stock.product_image !== null
+                                    ? stock.product_image.url
+                                    : require("../../assets/img/brand/coke.jpeg")
+                                }
+                              />
+                            </a>
+                            <span className="mb-0 text-sm">
                               {stock.product_name}
-                              
                             </span>
-                        </Media>
-                     </td>
-                   
+                          </Media>
+                        </td>
                       </th>
-                      <td >
-                            <span className="mb-0 text-sm" style={{display:"block"}}>
-                            {this.attributeCols(
-                              JSON.parse(stock.product_attributes),
-                              JSON.parse(stock.product_attributes_keys),
+                      <td>
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          {this.attributeCols(
+                            JSON.parse(stock.product_attributes),
+                            JSON.parse(stock.product_attributes_keys)
+                          )}
+                        </span>
+                        <br />
 
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>
+                            Selling Price:{" "}
+                          </span>
+                          {this.formatCurrency(stock.unit_selling_price)}
+                        </span>
 
-                            )}
-                           
-                            </span><br/>
-                            
-                            <span className="mb-0 text-sm" style={{display:"block"}}>
-                            <span style={{fontWeight:"bold"}}>Selling Price: </span>
-                            {this.formatCurrency(stock.unit_selling_price)}
-                              </span>
-                            
-                              <span className="mb-0 text-sm" style={{display:"block"}}>
-                            <span style={{fontWeight:"bold"}}>Cost Price: </span>
-                            {this.formatCurrency(stock.unit_price)}
-                              </span>
-                              
-                              <span className="mb-0 text-sm" style={{display:"block"}}>
-                              <span style={{fontWeight:"bold"}}>Total Stock: </span>{stock.stock_quantity}
-                              </span>
-                              <span className="mb-0 text-sm" style={{display:"block"}}>
-                                <span style={{fontWeight:"bold"}}>Sold: </span>{stock.quantity_sold}
-                              </span>
-                              <span className="mb-0 text-sm" style={{display:"block"}}>
-                                <span style={{fontWeight:"bold"}}>In Stock: </span>{stock.in_stock}
-                              </span>
-                              <span className="mb-0 text-sm" style={{display:"block"}}>
-                                <span style={{fontWeight:"bold"}}>Purchase ID: </span>{stock.tracking_id}
-                              </span>
-                             
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>
+                            Cost Price:{" "}
+                          </span>
+                          {this.formatCurrency(stock.unit_price)}
+                        </span>
 
-                            </td>
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>
+                            Total Stock:{" "}
+                          </span>
+                          {stock.stock_quantity}
+                        </span>
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>Sold: </span>
+                          {stock.quantity_sold}
+                        </span>
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>In Stock: </span>
+                          {stock.in_stock}
+                        </span>
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>
+                            Purchase ID:{" "}
+                          </span>
+                          {stock.tracking_id}
+                        </span>
+                      </td>
 
                       {/* <td>{stock.tracking_id}</td>
                       <td>{stock.quantity_sold}</td> */}
-                      <td>{this.formatCurrency(stock.new_stock_qty*stock.unit_price)}</td>
-                      <td>{this.formatCurrency(stock.quantity_sold*stock.unit_selling_price)}</td>
+                      <td>
+                        {this.formatCurrency(
+                          stock.new_stock_qty * stock.unit_price
+                        )}
+                      </td>
+                      <td>
+                        {this.formatCurrency(
+                          stock.quantity_sold * stock.unit_selling_price
+                        )}
+                      </td>
                       <td>{this.formatCurrency(stock.profit)}</td>
                       <td>
-                      {stock.in_stock == 0 ?<Button disabled color="primary" size="sm" 
-                        
-                         >
-                             Out of Stock
-                        </Button>:alreadyAdded === false ?  
-                       
-                       <Button variant="outline-primary" size="sm" 
-                      //  onClick={() => this.toggleAddToCart(stock)}
-                        //onClick={() => this.toggleAddSales(stock)} 
-                        >
+                        {stock.in_stock == 0 ? (
+                          <Button disabled color="primary" size="sm">
+                            Out of Stock
+                          </Button>
+                        ) : alreadyAdded === false ? (
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            //  onClick={() => this.toggleAddToCart(stock)}
+                            //onClick={() => this.toggleAddSales(stock)}
+                          >
                             In Stock
-                       </Button>
-                       :
-                       <Button color="primary" size="sm" 
-                       onClick={() => this.toggleCart(cartItem)}
-                        //onClick={() => this.toggleAddSales(stock)} 
-                        >
+                          </Button>
+                        ) : (
+                          <Button
+                            color="primary"
+                            size="sm"
+                            onClick={() => this.toggleCart(cartItem)}
+                            //onClick={() => this.toggleAddSales(stock)}
+                          >
                             View Sales made
-                       </Button>
-               }
-                      
+                          </Button>
+                        )}
                       </td>
-                      
                     </tr>
                   );
                 })}
               </tbody>
             </Table>
             <Row>
-              <Col md={12} style={{fontWeight:"bold",paddingTop:3}}>
-              {stocks.length<1&&
-                <div style={{color: '#ccc', alignSelf: 'center', padding: 10, fontSize: 13}}>
-                  <i className="fa fa-ban" style={{marginRight: 5}}/>
-                  No Stocks for the date Range 
-                </div>}
-              {stocks.length > 0 && <Pagination
-                  total={total}
-                  showTotal={total => `Total ${total} Stocks`}
-                  onChange={this.onPage}
-                  pageSize={rows}
-                  current={page}
-                />}
+              <Col md={12} style={{ fontWeight: "bold", paddingTop: 3 }}>
+                {stocks.length < 1 && (
+                  <div
+                    style={{
+                      color: "#ccc",
+                      alignSelf: "center",
+                      padding: 10,
+                      fontSize: 13,
+                    }}
+                  >
+                    <i className="fa fa-ban" style={{ marginRight: 5 }} />
+                    No Stocks for the date Range
+                  </div>
+                )}
+                {stocks.length > 0 && (
+                  <Pagination
+                    total={total}
+                    showTotal={(total) => `Total ${total} Stocks`}
+                    onChange={this.onPage}
+                    pageSize={rows}
+                    current={page}
+                  />
+                )}
               </Col>
             </Row>
           </Card.Body>

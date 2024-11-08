@@ -62,7 +62,7 @@ export class InvoiceIndex extends Component {
       fromdate: moment().startOf("month"),
       todate: moment().endOf("day"),
       currencies: currencies,
-      currency: "",
+      currency: "NGN",
     };
     this.searchDebounced = debounce(this.searchInvoices, 500);
     this.searchThrottled = throttle(this.searchInvoices, 500);

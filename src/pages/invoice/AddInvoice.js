@@ -125,6 +125,7 @@ export class AddInvoice extends Component {
       user: JSON.parse(localStorage.getItem("user")),
       english_ordinal_rules: new Intl.PluralRules("en", { type: "ordinal" }),
       suffixes: { one: "st", two: "nd", few: "rd", other: "th" },
+      total_balance: 0,
     };
     this.baseState = this.state;
   }
@@ -377,6 +378,7 @@ export class AddInvoice extends Component {
           description: "",
           receipt: res.data.invoice,
           new_items: res.data.items,
+          total_balance: res.total_balance,
         });
         this.getInvoiceId();
         this.getClients();
@@ -449,6 +451,7 @@ export class AddInvoice extends Component {
       hideNav,
       currencies,
       new_items,
+      total_balance,
       description,
       company,
       receipt,
@@ -472,6 +475,7 @@ export class AddInvoice extends Component {
               company={company}
               user={user}
               items={new_items}
+              total_balance={total_balance}
               ref={(el) => (this.componentRef = el)}
               toggle={() => this.setState({ receipt: [] })}
             />

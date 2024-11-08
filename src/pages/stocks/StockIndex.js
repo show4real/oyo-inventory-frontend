@@ -15,7 +15,7 @@ import {
 } from "@themesberg/react-bootstrap";
 import SpinDiv from "../components/SpinDiv";
 
-import { Pagination } from 'antd';
+import { Pagination } from "antd";
 
 export class StockIndex extends Component {
   constructor(props) {
@@ -33,21 +33,17 @@ export class StockIndex extends Component {
       total: 0,
       total_cart: 0,
       branch_id: props.match.params.id,
-
     };
-
   }
 
   componentDidMount() {
     this.getStocks();
-
   }
 
   showToast = (msg) => {
     toast(<div style={{ padding: 20, color: "success" }}>{msg}</div>);
   };
   getStocks = () => {
-
     const { page, rows, order, search, branch_id, products } = this.state;
     console.log(order);
     this.setState({ loading: true });
@@ -65,13 +61,13 @@ export class StockIndex extends Component {
         });
       },
       (error) => {
-        this.setState({ loading: false, });
+        this.setState({ loading: false });
       }
     );
   };
 
-  sleep = ms =>
-    new Promise(resolve => {
+  sleep = (ms) =>
+    new Promise((resolve) => {
       setTimeout(() => {
         resolve();
       }, ms);
@@ -80,10 +76,10 @@ export class StockIndex extends Component {
   loadOptions = async (search, prevOptions) => {
     options = [];
     var options = this.state.products.map((product, key) => {
-      return ({
+      return {
         value: product.id,
-        label: product.name
-      });
+        label: product.name,
+      };
     });
     await this.sleep(1000);
 
@@ -106,14 +102,14 @@ export class StockIndex extends Component {
 
     return {
       options: slicedOptions,
-      hasMore
+      hasMore,
     };
   };
 
   onPage = async (page, rows) => {
     await this.setState({ page, rows });
     await this.getStocks();
-  }
+  };
 
   onFilter = async (e, filter) => {
     console.log(filter);
@@ -121,7 +117,9 @@ export class StockIndex extends Component {
     await this.getStocks();
   };
 
-
+  onChange = (e, state) => {
+    this.setState({ [state]: e });
+  };
 
   attributeCols = (attribute_name, attribute_value) => {
     if (attribute_name !== null) {
@@ -130,32 +128,30 @@ export class StockIndex extends Component {
       attributes = attribute_name.split(",");
       values = attribute_value.split(",");
       return values.map((attrs, key) => {
-        return <p className="mb-0 text-sm" style={{ textTransform: "capitalize" }}>
-          <span style={{ fontWeight: "bold" }}>
-            {attrs + ":" + "  "}
-          </span>
-          {attributes[key]}
-        </p>;
+        return (
+          <p className="mb-0 text-sm" style={{ textTransform: "capitalize" }}>
+            <span style={{ fontWeight: "bold" }}>{attrs + ":" + "  "}</span>
+            {attributes[key]}
+          </p>
+        );
       });
     } else {
-      return <p style={{ fontWeight: "bold" }}>No variants</p>
+      return <p style={{ fontWeight: "bold" }}>No variants</p>;
     }
   };
 
   formatCurrency(x) {
-    if (x !== 'null' && x !== '0') {
+    if (x !== "null" && x !== "0") {
       const parts = x.toString().split(".");
       parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       return `\u20a6${parts.join(".")}`;
     }
-    return '0';
+    return "0";
   }
 
   toggleFilter = () => {
     this.setState({ showFilter: !this.state.showFilter });
   };
-
-
 
   render() {
     const {
@@ -184,8 +180,6 @@ export class StockIndex extends Component {
     } = this.state;
     return (
       <>
-
-
         {loading && <SpinDiv text={"Loading..."} />}
         <Row style={{}}>
           <Col lg="12">
@@ -218,12 +212,9 @@ export class StockIndex extends Component {
           </Col>
         </Row>
         <Row>
-          <div className="btn-toolbar mb-2 mb-md-0">
-
-          </div>
+          <div className="btn-toolbar mb-2 mb-md-0"></div>
           <Col lg="7">
             <h6>Stocks({total})</h6>
-
           </Col>
           <Col lg="1">
             {!showFilter && (
@@ -256,7 +247,6 @@ export class StockIndex extends Component {
                     });
                   }
                 }}
-
               />
               <Button
                 className="btn-icon btn-2"
@@ -267,18 +257,14 @@ export class StockIndex extends Component {
               >
                 <i className="fa fa-search" />
               </Button>
-
             </div>
           </Col>
         </Row>
         <Row>
           <Col md={12}>
-
-
             {showFilter && (
               <Row>
                 <Col md={4}>
-                  
                   <Form.Select
                     value={order}
                     type="select"
@@ -293,7 +279,6 @@ export class StockIndex extends Component {
                   </Form.Select>
                 </Col>
                 <Col md={4}>
-
                   <Button
                     color="warning"
                     onClick={this.toggleFilter}
@@ -302,10 +287,8 @@ export class StockIndex extends Component {
                   >
                     Hide Filters
                   </Button>
-
                 </Col>
               </Row>
-
             )}
           </Col>
         </Row>
@@ -324,10 +307,7 @@ export class StockIndex extends Component {
                 })}
               </div>
             </Col> */}
-            <Col lg="2" style={{ color: "primary", paddingTop: "15px" }}>
-
-
-            </Col>
+            <Col lg="2" style={{ color: "primary", paddingTop: "15px" }}></Col>
           </Row>
           <Card.Body className="pb-0">
             <Table
@@ -349,84 +329,113 @@ export class StockIndex extends Component {
               </thead>
               <tbody>
                 {stocks.map((stock, key) => {
-
                   return (
                     <tr key={key}>
                       <th scope="row">
-                        <td><Media className="align-items-center">
-                          <a
-                            className="avatar rounded-circle mr-3"
-                            href="#p"
-                            onClick={(e) => e.preventDefault()}
-                          >
-                            <img
-                              style={{
-                                maxHeight: 50,
-                                maxWidth: 50,
-                                borderRadius: 5,
-
-                              }}
-                              alt="..."
-                              src={
-                                stock.product_image !== null ? stock.product_image.url :
-                                  require("../../assets/img/brand/coke.jpeg")
-                              }
-                            />
-
-
-                          </a>
-                          <span className="mb-0 text-sm" >
-                            {stock.product_name}
-
-                          </span>
-                        </Media>
+                        <td>
+                          <Media className="align-items-center">
+                            <a
+                              className="avatar rounded-circle mr-3"
+                              href="#p"
+                              onClick={(e) => e.preventDefault()}
+                            >
+                              {stock.product_image !== null && (
+                                <img
+                                  style={{
+                                    maxHeight: 50,
+                                    maxWidth: 50,
+                                    borderRadius: 5,
+                                  }}
+                                  alt="..."
+                                  src={stock.product_image}
+                                />
+                              )}
+                            </a>
+                            <span className="mb-0 text-sm">
+                              {stock.product_name}
+                            </span>
+                          </Media>
                         </td>
-
                       </th>
                       <td>{stock.branch_name}</td>
-                      <td >
-                        <span className="mb-0 text-sm" style={{ display: "block" }}>
+                      <td>
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
                           {this.attributeCols(
                             JSON.parse(stock.order.product_attributes),
-                            JSON.parse(stock.order.product_attributes_keys),
-
-
+                            JSON.parse(stock.order.product_attributes_keys)
                           )}
+                        </span>
+                        <br />
 
-                        </span><br />
-
-                        <span className="mb-0 text-sm" style={{ display: "block" }}>
-                          <span style={{ fontWeight: "bold" }}>Selling Price: </span>
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>
+                            Selling Price:{" "}
+                          </span>
                           {this.formatCurrency(stock.order.unit_selling_price)}
                         </span>
 
-                        <span className="mb-0 text-sm" style={{ display: "block" }}>
-                          <span style={{ fontWeight: "bold" }}>Cost Price: </span>
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>
+                            Cost Price:{" "}
+                          </span>
                           {this.formatCurrency(stock.order.unit_price)}
                         </span>
 
-                        <span className="mb-0 text-sm" style={{ display: "block" }}>
-                          <span style={{ fontWeight: "bold" }}>Initial Stock: </span>{stock.stock_quantity}
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>
+                            Initial Stock:{" "}
+                          </span>
+                          {stock.stock_quantity}
                         </span>
-                        <span className="mb-0 text-sm" style={{ display: "block" }}>
-                          <span style={{ fontWeight: "bold" }}>Sold: </span>{stock.quantity_sold}
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>Sold: </span>
+                          {stock.quantity_sold}
                         </span>
-                        <span className="mb-0 text-sm" style={{ display: "block" }}>
-                          <span style={{ fontWeight: "bold" }}>In Stock: </span>{stock.in_stock}
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>In Stock: </span>
+                          {stock.in_stock}
                         </span>
-                        <span className="mb-0 text-sm" style={{ display: "block" }}>
-                          <span style={{ fontWeight: "bold" }}>Purchase ID: </span>{stock.order.tracking_id}
+                        <span
+                          className="mb-0 text-sm"
+                          style={{ display: "block" }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>
+                            Purchase ID:{" "}
+                          </span>
+                          {stock.order.tracking_id}
                         </span>
-
-
                       </td>
                       <td>{stock.order.supplier_name}</td>
                       <td>{stock.quantity_sold}</td>
 
-                      <td>{this.formatCurrency(stock.quantity_sold * stock.order.unit_selling_price)}</td>
                       <td>
-                        <Button variant="outline-primary" size="sm"
-                           onClick={() => {
+                        {this.formatCurrency(
+                          stock.quantity_sold * stock.order.unit_selling_price
+                        )}
+                      </td>
+                      <td>
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={() => {
                             //console.log('111')
                             this.props.history.push(
                               "/stock/" +
@@ -435,32 +444,39 @@ export class StockIndex extends Component {
                                 stock.order.product_id
                             );
                           }}
-
                         >
                           View
                         </Button>
                       </td>
-
                     </tr>
                   );
                 })}
               </tbody>
             </Table>
             <Row>
-
               <Col md={12} style={{ fontWeight: "bold", paddingTop: 3 }}>
-              {stocks.length<1&&
-                <div style={{color: '#ccc', alignSelf: 'center', padding: 10, fontSize: 13}}>
-                  <i className="fa fa-ban" style={{marginRight: 5}}/>
-                  No Stocks for the date Range 
-                </div>}
-                {stocks.length > 0 && <Pagination
-                  total={total}
-                  showTotal={total => `Total ${total} Stocks`}
-                  onChange={this.onPage}
-                  pageSize={rows}
-                  current={page}
-                />}
+                {stocks.length < 1 && (
+                  <div
+                    style={{
+                      color: "#ccc",
+                      alignSelf: "center",
+                      padding: 10,
+                      fontSize: 13,
+                    }}
+                  >
+                    <i className="fa fa-ban" style={{ marginRight: 5 }} />
+                    No Stocks for the date Range
+                  </div>
+                )}
+                {stocks.length > 0 && (
+                  <Pagination
+                    total={total}
+                    showTotal={(total) => `Total ${total} Stocks`}
+                    onChange={this.onPage}
+                    pageSize={rows}
+                    current={page}
+                  />
+                )}
               </Col>
             </Row>
           </Card.Body>

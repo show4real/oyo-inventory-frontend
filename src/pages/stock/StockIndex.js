@@ -30,9 +30,9 @@ import AsyncSelect from "react-select/async";
 import AddStock from "./AddStock";
 import EditStock from "./EditStock";
 import moment from "moment";
-import 'antd/dist/antd.css';
-import { Pagination } from 'antd';
-import {formatCurrency,format} from "../../services/formatCurrencyService";
+import "antd/dist/antd.css";
+import { Pagination } from "antd";
+import { formatCurrency, format } from "../../services/formatCurrencyService";
 import ReactDatetime from "react-datetime";
 
 export class StockIndex extends Component {
@@ -47,16 +47,16 @@ export class StockIndex extends Component {
       total_cost: [],
       products: [],
       p: [],
-      branch:'',
-      branches:[],
+      branch: "",
+      branches: [],
       order: "",
       value: "",
       total: 0,
       total_cart: 0,
       cartItem: [],
       options: [],
-      fromdate: moment().startOf('month'),
-      todate: moment().endOf('day'),
+      fromdate: moment().startOf("month"),
+      todate: moment().endOf("day"),
     };
     //this.handleChange = this.handleChange.bind(this);
     this.cartItem = JSON.parse(localStorage.getItem("cart"));
@@ -72,16 +72,25 @@ export class StockIndex extends Component {
     toast(<div style={{ padding: 20, color: "success" }}>{msg}</div>);
   };
 
-  formatNumber=(number)=>{
+  formatNumber = (number) => {
     return format(number);
-  }
+  };
 
   getPurchaseOrders = () => {
-    const { page, rows, order, search,branch, products,fromdate, todate } = this.state;
+    const { page, rows, order, search, branch, products, fromdate, todate } =
+      this.state;
     console.log(order);
     console.log(branch);
     this.setState({ loading: true });
-    getAllPurchaseOrders({ page, rows, order, branch, search,fromdate, todate }).then(
+    getAllPurchaseOrders({
+      page,
+      rows,
+      order,
+      branch,
+      search,
+      fromdate,
+      todate,
+    }).then(
       (res) => {
         console.log(res);
         this.setState({
@@ -89,7 +98,7 @@ export class StockIndex extends Component {
           purchase_orders: res.purchase_orders.data,
           attributes: res.attributes,
           products: res.products,
-         
+
           p: res.products.map((opt) => ({ label: opt.name, value: opt.id })),
           suppliers: res.suppliers,
           branches: res.branches,
@@ -121,9 +130,9 @@ export class StockIndex extends Component {
   };
 
   onFilter = async (e, filter) => {
-    if(filter==='order'){
-      await this.setState({branch: ''});
-    } 
+    if (filter === "order") {
+      await this.setState({ branch: "" });
+    }
     await this.setState({ [filter]: e });
     await this.getPurchaseOrders();
   };
@@ -171,7 +180,6 @@ export class StockIndex extends Component {
     this.setState({ cartCheckout });
   };
 
-
   toggleAddStock = () => {
     this.setState({ addStock: !this.state.addStock });
   };
@@ -203,10 +211,9 @@ export class StockIndex extends Component {
     this.setState({ [state]: e });
   };
 
-  formatC=(x)=>{
-    return formatCurrency(x)
-  }
-
+  formatC = (x) => {
+    return formatCurrency(x);
+  };
 
   render() {
     const {
@@ -232,7 +239,8 @@ export class StockIndex extends Component {
       branch,
       addToCart,
       total_cost,
-      fromdate, todate
+      fromdate,
+      todate,
     } = this.state;
     return (
       <>
@@ -269,16 +277,17 @@ export class StockIndex extends Component {
                   }}
                 >
                   <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
-                  <Breadcrumb.Item href="#Purchase orders">Purchase Order</Breadcrumb.Item>
+                  <Breadcrumb.Item href="#Purchase orders">
+                    Purchase Order
+                  </Breadcrumb.Item>
                 </Breadcrumb>
               </div>
-              <div className="btn-toolbar mb-2 mb-md-0" >
+              <div className="btn-toolbar mb-2 mb-md-0">
                 <ButtonGroup>
                   <Button
                     variant="outline-primary"
                     size="sm"
                     onClick={() => this.toggleAddStock()}
-                    
                   >
                     Create Purchase Order
                   </Button>
@@ -291,8 +300,6 @@ export class StockIndex extends Component {
                   >
                     Products
                   </Button>
-
-                
                 </ButtonGroup>
               </div>
             </div>
@@ -302,45 +309,48 @@ export class StockIndex extends Component {
           <Col lg="7">
             <Row>
               <Col md={5}>
-              <h6>Purchase Orders  ({total})</h6>
+                <h6>Purchase Orders ({total})</h6>
               </Col>
               <Col md={3}>
-              <ReactDatetime
-                        value={fromdate}
-                        dateFormat={'MMM D, YYYY'}
-                        closeOnSelect
-                        onChange={e=>this.onFilter(e, 'fromdate')}
-                        inputProps={{
-                          required: true,
-                          className: 'form-control date-filter'
-                        }}
-                        isValidDate={(current)=>{return (current.isBefore(todate)||current.isSame(todate))&&current.isBefore(moment());}}
-                        timeFormat={false}
-                    />
-                 
-                      
+                <ReactDatetime
+                  value={fromdate}
+                  dateFormat={"MMM D, YYYY"}
+                  closeOnSelect
+                  onChange={(e) => this.onFilter(e, "fromdate")}
+                  inputProps={{
+                    required: true,
+                    className: "form-control date-filter",
+                  }}
+                  isValidDate={(current) => {
+                    return (
+                      (current.isBefore(todate) || current.isSame(todate)) &&
+                      current.isBefore(moment())
+                    );
+                  }}
+                  timeFormat={false}
+                />
               </Col>
-             
+
               <Col md={3}>
-             
-                      <ReactDatetime
-                        value={todate}
-                        dateFormat={'MMM D, YYYY'}
-                        closeOnSelect
-                        onChange={e=>this.onFilter(e, 'todate')}
-                        inputProps={{
-                          required: true,
-                          className: 'form-control date-filter'
-                        }}
-                        isValidDate={(current)=>{return (current.isAfter(fromdate)||current.isSame(fromdate))&&current.isBefore(moment());}}
-                        timeFormat={false}
-                      />
+                <ReactDatetime
+                  value={todate}
+                  dateFormat={"MMM D, YYYY"}
+                  closeOnSelect
+                  onChange={(e) => this.onFilter(e, "todate")}
+                  inputProps={{
+                    required: true,
+                    className: "form-control date-filter",
+                  }}
+                  isValidDate={(current) => {
+                    return (
+                      (current.isAfter(fromdate) || current.isSame(fromdate)) &&
+                      current.isBefore(moment())
+                    );
+                  }}
+                  timeFormat={false}
+                />
               </Col>
-                    
-                   
-                    
             </Row>
-            
           </Col>
           <Col lg="1">
             {!showFilter && (
@@ -416,11 +426,10 @@ export class StockIndex extends Component {
                 <Col md={4}>
                   <Button
                     color="warning"
-                    onClick={async ()=>{
+                    onClick={async () => {
                       this.toggleFilter();
-                      await this.setState({branch: '', order: ''})
-                      this.getPurchaseOrders()
-                      
+                      await this.setState({ branch: "", order: "" });
+                      this.getPurchaseOrders();
                     }}
                     size="sm"
                     style={{ marginRight: 10 }}
@@ -435,13 +444,15 @@ export class StockIndex extends Component {
 
         <Card border="light" className="shadow-sm mb-4">
           <Row>
-            <div className="btn-toolbar mb-2 mb-md-0"  style={{padding:"20px"}}>
+            <div
+              className="btn-toolbar mb-2 mb-md-0"
+              style={{ padding: "20px" }}
+            >
               <ButtonGroup>
                 <Button
                   variant="outline-primary"
                   size="sm"
                   onClick={() => this.toggleAddStock()}
-                 
                 >
                   Create Purchase Order
                 </Button>
@@ -485,59 +496,66 @@ export class StockIndex extends Component {
                   <th className="border-0">Unit Price</th>
                   <th className="border-0">Total cost</th>
                   <th className="border-0">Date</th>
-
-                 
                 </tr>
               </thead>
               <tbody>
                 {purchase_orders.map((purchase_order, key) => {
                   const alreadyAdded = this.inCart(purchase_order.id);
                   return (
-                    <tr key={key} style={{fontWeight:"bold"}}>
+                    <tr key={key} style={{ fontWeight: "bold" }}>
                       <td>{purchase_order.product_name}</td>
                       <td>{purchase_order.supplier.name}</td>
                       <td>{purchase_order.tracking_id}</td>
-                      <td>{this.formatNumber(purchase_order.stock_quantity)}</td>
+                      <td>
+                        {this.formatNumber(purchase_order.stock_quantity)}
+                      </td>
                       <td>{this.formatC(purchase_order.unit_price)}</td>
                       <td>
-                        {this.formatC(purchase_order.stock_quantity *
-                          purchase_order.unit_price)}
+                        {this.formatC(
+                          purchase_order.stock_quantity *
+                            purchase_order.unit_price
+                        )}
                       </td>
                       <td>
-                        {moment(purchase_order.created_at).format('MMM D, YYYY')
-                        }
+                        {moment(purchase_order.created_at).format(
+                          "MMM D, YYYY"
+                        )}
                       </td>
 
                       <td>
-                        {purchase_order.status == 'Confirmed' ? <Button
-                          variant="outline-primary"
-                          size="sm"
-                          onClick={() => {
-                            //console.log('111')
-                            this.props.history.push(
-                              "/purchase_order/" +
-                                purchase_order.id +
-                                "/product/" +
-                                purchase_order.product_id
-                            );
-                          }}
-                        >
-                          View stock
-                        </Button>:<Button
-                          variant="outline-primary"
-                          size="sm"
-                          onClick={() => {
-                            //console.log('111')
-                            this.props.history.push(
-                              "/purchase_order/" +
-                                purchase_order.id +
-                                "/product/" +
-                                purchase_order.product_id
-                            );
-                          }}
-                        >
-                          confirm stock
-                        </Button>}
+                        {purchase_order.status == "Confirmed" ? (
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => {
+                              //console.log('111')
+                              this.props.history.push(
+                                "/purchase_order/" +
+                                  purchase_order.id +
+                                  "/product/" +
+                                  purchase_order.product_id
+                              );
+                            }}
+                          >
+                            View stock
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => {
+                              //console.log('111')
+                              this.props.history.push(
+                                "/purchase_order/" +
+                                  purchase_order.id +
+                                  "/product/" +
+                                  purchase_order.product_id
+                              );
+                            }}
+                          >
+                            confirm stock
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   );
@@ -545,19 +563,29 @@ export class StockIndex extends Component {
               </tbody>
             </Table>
             <Row>
-              <Col md={12} style={{fontWeight:"bold",paddingTop:3}}>
-              {purchase_orders.length<1&&
-                <div style={{color: '#ccc', alignSelf: 'center', padding: 10, fontSize: 13}}>
-                  <i className="fa fa-ban" style={{marginRight: 5}}/>
-                  No Stock for the date Range 
-                </div>}
-              {purchase_orders.length > 0 && <Pagination
-                  total={total}
-                  showTotal={total => `Total ${total} orders`}
-                  onChange={this.onPage}
-                  pageSize={rows}
-                  current={page}
-                />}
+              <Col md={12} style={{ fontWeight: "bold", paddingTop: 3 }}>
+                {purchase_orders.length < 1 && (
+                  <div
+                    style={{
+                      color: "#ccc",
+                      alignSelf: "center",
+                      padding: 10,
+                      fontSize: 13,
+                    }}
+                  >
+                    <i className="fa fa-ban" style={{ marginRight: 5 }} />
+                    No Stock for the date Range
+                  </div>
+                )}
+                {purchase_orders.length > 0 && (
+                  <Pagination
+                    total={total}
+                    showTotal={(total) => `Total ${total} orders`}
+                    onChange={this.onPage}
+                    pageSize={rows}
+                    current={page}
+                  />
+                )}
               </Col>
             </Row>
           </Card.Body>

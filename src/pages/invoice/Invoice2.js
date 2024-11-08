@@ -54,7 +54,7 @@ export class Invoice extends React.Component {
   };
 
   render() {
-    const { invoice, company, items, pos_items } = this.props;
+    const { invoice, company, items, pos_items, total_balance } = this.props;
     const combinedItems = this.combineItems(pos_items);
 
     return (
@@ -93,7 +93,7 @@ export class Invoice extends React.Component {
                 <br />
                 {company.address}
               </div>
-              <div style={{ textAlign: "right" }}>
+              <div style={{ textAlign: "right", fontWeight: "bold" }}>
                 <strong>Client:</strong> {invoice.client.name}
                 <br />
                 {invoice.client.phone}
@@ -175,10 +175,11 @@ export class Invoice extends React.Component {
               }}
             >
               Total: {this.formatCurrency2(invoice.amount)}
-              {invoice.total_balance > 0 && (
+              {/* Previous Balance:  */}
+              {total_balance > 0 && (
                 <>
                   <br />
-                  Balance: {this.formatCurrency2(invoice.total_balance)}
+                  Balance: {this.formatCurrency2(total_balance)}
                 </>
               )}
             </div>

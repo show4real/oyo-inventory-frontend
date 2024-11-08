@@ -74,6 +74,7 @@ export class PosOrderIndex extends Component {
       due_date: moment().startOf("month"),
       invoice: {},
       pos_items: [],
+      total_balance: 0,
     };
 
     this.searchDebounced = debounce(this.getPurchaseOrders, 500);
@@ -277,6 +278,7 @@ export class PosOrderIndex extends Component {
           //sold_at: res.sold_at,
           invoice: res.invoice,
           pos_items: res.pos_items,
+          total_balance: res.total_balance,
           cartItem: [],
         });
         console.log(this.state.cart_details);
@@ -504,6 +506,7 @@ export class PosOrderIndex extends Component {
       addClient,
       cart_details,
       pos_items,
+      total_balance,
       invoice,
       user,
       saving,
@@ -516,6 +519,7 @@ export class PosOrderIndex extends Component {
               pos_items={pos_items}
               invoice={invoice}
               company={company}
+              total_balance={total_balance}
               user={user}
               ref={(el) => (this.componentRef = el)}
               toggle={() => this.setState({ invoice: {} })}

@@ -68,7 +68,8 @@ export class Invoice extends React.Component {
   }
 
   render() {
-    const { invoice, user, previous_payment, items, company } = this.props;
+    const { invoice, user, previous_payment, items, company, total_balance } =
+      this.props;
 
     return (
       <div style={{ padding: 10 }}>
@@ -383,7 +384,7 @@ export class Invoice extends React.Component {
                   </td>
                 </tr>
                 <tr>
-                  {invoice.total_balance > 0 && (
+                  {total_balance > 0 && (
                     <>
                       <td
                         colspan="3"
@@ -404,10 +405,7 @@ export class Invoice extends React.Component {
                             "monaco, Consolas, Lucida Console, monospace",
                         }}
                       >
-                        {this.formatCurrency(
-                          invoice.currency,
-                          invoice.total_balance
-                        )}
+                        {this.formatCurrency(invoice.currency, total_balance)}
                       </td>
                     </>
                   )}
