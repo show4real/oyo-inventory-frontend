@@ -40,7 +40,7 @@ export class PosOrderIndex extends Component {
     this.state = {
       search: "",
       page: 1,
-      rows: 3,
+      rows: 10,
       loading: false,
       saving: false,
       stocks: [],
@@ -222,10 +222,20 @@ export class PosOrderIndex extends Component {
     const { cartItem, company, payment_mode, amount_paid, client_id } =
       this.state;
 
+    let check_serials =
+      cartItem.some((ele) => ele.quantity === 0) ||
+      cartItem.some((ele) => ele.quantity === undefined);
+
     toast.dismiss();
     toast.configure({ hideProgressBar: true, closeButton: false });
 
-    if (payment_mode == "") {
+    if (check_serials) {
+      if (company.sell_by_serial_no == 1) {
+        this.showToastError("Please Select serials");
+      } else {
+        this.showToastError("Please Select Quantity");
+      }
+    } else if (payment_mode == "") {
       this.showToastError("Please Add Payment Mode");
     } else if (client_id == "") {
       this.showToastError("Please Select a client");
@@ -536,7 +546,7 @@ export class PosOrderIndex extends Component {
         )}
 
         {/* {loading && <SpinDiv text={"Loading..."} />} */}
-        <div style={{ margin: 15 }}>
+        <div style={{ margin: 10 }}>
           <Row>
             <Col lg="12">
               <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
@@ -582,7 +592,7 @@ export class PosOrderIndex extends Component {
                   </Col>
                 </Row>
               </Col>
-              <Col lg={4} style={{ color: "primary", paddingTop: "15px" }}>
+              <Col md={4} style={{ color: "primary", paddingTop: "15px" }}>
                 <div className="btn-toolbar mb-2 mb-md-0">
                   <ButtonGroup>
                     {cartItem !== null ? (
@@ -634,90 +644,88 @@ export class PosOrderIndex extends Component {
               </Col>
             </Row>
             <Row>
-              <Col md={12}>
+              <Col md={6}>
                 <Card.Body className="pb-0">
-                  <Table
-                    responsive
-                    className="table-centered table-nowrap rounded mb-0"
-                  >
-                    <thead className="thead-light">
-                      <tr>
-                        <th className="border-0">Code</th>
-                        <th className="border-0">Description</th>
-                        <th className="border-0">Instock</th>
-                        <th className="border-0">Stock</th>
-                        <th className="border-0">Price</th>
-                        <th className="border-0">Action</th>
-                        {/* <th className="border-0">Stock Order ID</th> */}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {stocks
-                        .filter((stock) => stock.in_stock > 0)
-                        .map((stock, key) => {
-                          const alreadyAdded = this.inCart(stock.id);
+                  <div style={{ maxHeight: "500px", overflowY: "auto" }}>
+                    <Table
+                      responsive
+                      className="table-centered table-nowrap rounded mb-0"
+                    >
+                      <thead className="thead-light">
+                        <tr>
+                          <th className="border-0">Description</th>
 
-                          return (
-                            <tr key={key}>
-                              <td>
-                                <span style={{ fontWeight: "bold" }}>
-                                  {" "}
-                                  {stock.tracking}{" "}
-                                </span>
-                              </td>
-                              <td>
-                                <span className="mb-0 text-sm">
-                                  {stock.product_name + " "}
-                                </span>
-                              </td>
+                          <th className="border-0">Price</th>
+                          <th className="border-0">Action</th>
+                          {/* <th className="border-0">Stock Order ID</th> */}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {stocks
+                          .filter((stock) => stock.in_stock > 0)
+                          .map((stock, key) => {
+                            const alreadyAdded = this.inCart(stock.id);
 
-                              <td>
-                                {" "}
-                                <span style={{ fontWeight: "bold" }}>
-                                  {" "}
-                                  {stock.in_stock}
-                                </span>
-                              </td>
-                              <td>
-                                <span style={{ fontWeight: "bold" }}>
-                                  {stock.stock_quantity}{" "}
-                                </span>
-                              </td>
-                              <td>
-                                <span style={{ fontWeight: "bold" }}>
-                                  {" "}
-                                  {this.formatCurrency(
-                                    stock.order.fixed_price
-                                  )}{" "}
-                                </span>
-                              </td>
+                            return (
+                              <tr key={key}>
+                                <td>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {stock.product_name + " "}
+                                  </span>
+                                  <div>
+                                    <span style={{ fontSize: 15, padding: 10 }}>
+                                      {" "}
+                                      Code: {stock.tracking}{" "}
+                                    </span>
+                                    <span style={{ fontSize: 15, padding: 10 }}>
+                                      {" "}
+                                      In Stock: {stock.in_stock}
+                                      <br />
+                                    </span>
+                                    <span style={{ fontSize: 15, padding: 10 }}>
+                                      Total Stock: {stock.stock_quantity}{" "}
+                                    </span>
+                                  </div>
+                                </td>
 
-                              <td>
-                                {stock.in_stock <= 0 ? (
-                                  <Button disabled color="primary" size="sm">
-                                    Out of Stock
-                                  </Button>
-                                ) : alreadyAdded === false ? (
-                                  <Button
-                                    variant="outline-primary"
-                                    size="sm"
-                                    onClick={() => this.toggleAddToCart(stock)}
-                                  >
-                                    <FontAwesomeIcon icon={faPlus} />
-                                  </Button>
-                                ) : (
-                                  <Button color="primary" size="sm" disabled>
-                                    <FontAwesomeIcon icon={faCheck} />
-                                  </Button>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                    </tbody>
-                  </Table>
+                                <td>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {" "}
+                                    {this.formatCurrency(
+                                      stock.order.fixed_price
+                                    )}{" "}
+                                  </span>
+                                </td>
+
+                                <td>
+                                  {stock.in_stock <= 0 ? (
+                                    <Button disabled color="primary" size="sm">
+                                      Out of Stock
+                                    </Button>
+                                  ) : alreadyAdded === false ? (
+                                    <Button
+                                      variant="outline-primary"
+                                      size="sm"
+                                      onClick={() =>
+                                        this.toggleAddToCart(stock)
+                                      }
+                                    >
+                                      <FontAwesomeIcon icon={faPlus} />
+                                    </Button>
+                                  ) : (
+                                    <Button color="primary" size="sm" disabled>
+                                      <FontAwesomeIcon icon={faCheck} />
+                                    </Button>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                      </tbody>
+                    </Table>
+                  </div>
                   <Row>
-                    <Col md={12} style={{ fontWeight: "bold", paddingTop: 3 }}>
+                    <Col md={12} style={{ fontWeight: "bold", paddingTop: 30 }}>
                       {stocks.filter((stock) => stock.in_stock > 0).length >
                       0 ? (
                         <Pagination
@@ -746,9 +754,7 @@ export class PosOrderIndex extends Component {
                   </Row>
                 </Card.Body>
               </Col>
-            </Row>
-            <Row>
-              <Col md={12}>
+              <Col md={6}>
                 <Card.Body className="pb-0">
                   <div className="modal-header" style={{ padding: "1rem" }}>
                     <div className="btn-toolbar mb-2 mb-md-0">
@@ -769,51 +775,76 @@ export class PosOrderIndex extends Component {
                   </div>
 
                   {cart_details.length == 0 ? (
-                    <div>
-                      <Table responsive className="table-nowrap rounded mb-0">
-                        <thead className="thead-light">
-                          <tr>
-                            <th className="border-0">Product</th>
-                            <th className="border-0">Price</th>
-                            <th className="border-0">Quantity</th>
-                            <th className="border-0">Amount</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {cartItem.map((sale, key) => {
-                            const alreadyAdded = this.inCart(sale.id);
-                            return (
-                              <tr>
-                                <td>
-                                  <Media className="align-items-center">
-                                    <span
-                                      className="mb-0 text-sm"
-                                      style={{
-                                        fontWeight: "bold",
-                                        fontSize: 15,
-                                        paddingLeft: 5,
-                                      }}
-                                    >
-                                      {sale.product_name +
-                                        ` X ${sale.quantity}`}
-                                      <br />
-                                    </span>
-                                    <Button
-                                      size="xs"
-                                      style={{
-                                        marginLeft: "60px",
-                                        backgroundColor: "white",
-                                        color: "black",
-                                      }}
-                                      onClick={() => this.removeFromCart(key)}
-                                    >
-                                      <i className="fa fa-trash" />
-                                    </Button>
-                                  </Media>
-                                </td>
+                    <>
+                      <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+                        <Table responsive className="table-nowrap rounded mb-0">
+                          <thead className="thead-light">
+                            <tr>
+                              <th className="border-0">Product</th>
+                              <th className="border-0">Price</th>
 
-                                <td>
-                                  {/* <InputNumber
+                              <th className="border-0">Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {cartItem.map((sale, key) => {
+                              const alreadyAdded = this.inCart(sale.id);
+                              return (
+                                <tr>
+                                  <td>
+                                    <Media className="align-items-center">
+                                      <span
+                                        className="mb-0 text-sm"
+                                        style={{
+                                          fontWeight: "bold",
+                                          fontSize: 15,
+                                          paddingLeft: 5,
+                                        }}
+                                      >
+                                        {sale.product_name +
+                                          ` X ${sale.quantity}`}
+                                        <br />
+                                      </span>
+                                      <Button
+                                        size="xs"
+                                        style={{
+                                          marginLeft: "60px",
+                                          backgroundColor: "white",
+                                          color: "red",
+                                          borderColor: "red",
+                                          marginLeft: 10,
+                                        }}
+                                        onClick={() => this.removeFromCart(key)}
+                                      >
+                                        <i className="fa fa-trash" />
+                                      </Button>
+                                      &nbsp; &nbsp; &nbsp; &nbsp;
+                                      <Button
+                                        size="sm"
+                                        variant="outline-primary"
+                                        onClick={() =>
+                                          this.decrementCount(sale, key)
+                                        }
+                                      >
+                                        -
+                                      </Button>
+                                      <span style={{ padding: "10px" }}>
+                                        {sale.quantity}
+                                      </span>
+                                      <Button
+                                        size="sm"
+                                        variant="outline-primary"
+                                        onClick={() =>
+                                          this.incrementCount(sale, key)
+                                        }
+                                      >
+                                        +
+                                      </Button>
+                                    </Media>
+                                  </td>
+
+                                  <td>
+                                    {/* <InputNumber
                                     style={{
                                       width: "auto",
                                       height: 40,
@@ -840,104 +871,42 @@ export class PosOrderIndex extends Component {
                                       this.handlePriceChange(event, key)
                                     }
                                   /> */}
-                                  <input
-                                    style={{
-                                      width: "auto",
-                                      height: 40,
-                                      paddingTop: 5,
-                                      borderRadius: 5,
-                                      fontSize: 18,
-                                    }}
-                                    onKeyPress={(event) => {
-                                      if (!/[0-9]/.test(event.key)) {
-                                        event.preventDefault();
+                                    <input
+                                      style={{
+                                        width: 100,
+                                        height: 40,
+                                        paddingTop: 5,
+                                        borderRadius: 5,
+                                        fontSize: 18,
+                                      }}
+                                      onKeyPress={(event) => {
+                                        if (!/[0-9]/.test(event.key)) {
+                                          event.preventDefault();
+                                        }
+                                      }}
+                                      parser={(value) =>
+                                        value.replace(/\$\s?|(,*)/g, "")
                                       }
-                                    }}
-                                    parser={(value) =>
-                                      value.replace(/\$\s?|(,*)/g, "")
-                                    }
-                                    value={sale.order.unit_selling_price}
-                                    onChange={(event) =>
-                                      this.handlePriceChange(event, key)
-                                    }
-                                  />
-                                </td>
-                                <td>
-                                  {" "}
-                                  <div>
-                                    <Button
-                                      size="sm"
-                                      variant="outline-primary"
-                                      onClick={() =>
-                                        this.decrementCount(sale, key)
+                                      value={sale.order.unit_selling_price}
+                                      onChange={(event) =>
+                                        this.handlePriceChange(event, key)
                                       }
-                                    >
-                                      -
-                                    </Button>
+                                    />
+                                  </td>
 
-                                    <span style={{ padding: "10px" }}>
-                                      {sale.quantity}
-                                    </span>
-
-                                    <Button
-                                      size="sm"
-                                      variant="outline-primary"
-                                      onClick={() =>
-                                        this.incrementCount(sale, key)
-                                      }
-                                    >
-                                      +
-                                    </Button>
-                                  </div>
-                                </td>
-
-                                <td>
-                                  {sale.quantity *
-                                    sale.order.unit_selling_price}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </Table>
-                      <Table style={{ border: "none" }}>
-                        <tr>
-                          <Row
-                            style={{
-                              border: "1px #eee solid",
-                              padding: "10px 5px 0px",
-                              margin: "20px 15px",
-                              borderRadius: 7,
-                            }}
-                          >
-                            <Col md={6} style={{ marginBottom: 20 }}>
-                              <Form.Label>Clients</Form.Label>
-                              <AsyncPaginate
-                                onChange={this.handleClientChange}
-                                loadOptions={this.loadClients(clients)}
-                                additional={{
-                                  page: 1,
-                                }}
-                              />
-                            </Col>
-                            <Col md={4} style={{ marginBottom: 20 }}>
-                              <div>
-                                <Form.Label>New Clients</Form.Label>
-                              </div>
-                              <ButtonGroup>
-                                <Button
-                                  variant="outline-primary"
-                                  size="sm"
-                                  onClick={() => this.toggleAddClient()}
-                                >
-                                  + New Client
-                                </Button>
-                              </ButtonGroup>
-                            </Col>
-                          </Row>
-                        </tr>
-                        <tr>
-                          {cartItem.length > 0 && (
+                                  <td>
+                                    {sale.quantity *
+                                      sale.order.unit_selling_price}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </Table>
+                      </div>
+                      <div>
+                        <Table style={{ border: "none" }}>
+                          <tr>
                             <Row
                               style={{
                                 border: "1px #eee solid",
@@ -947,61 +916,28 @@ export class PosOrderIndex extends Component {
                               }}
                             >
                               <Col md={4}>
-                                <Form.Group className="mb-2">
-                                  <Form.Label>Amount Received</Form.Label>
-                                  <InputGroup>
-                                    <InputGroup.Text>
-                                      {/* {currency} */}
-                                    </InputGroup.Text>
-                                    <InputNumber
-                                      style={{
-                                        width: "auto",
-                                        height: 40,
-                                        paddingTop: 5,
-                                        borderRadius: 5,
-                                        fontSize: 18,
-                                      }}
-                                      formatter={(value) =>
-                                        `${value}`.replace(
-                                          /\B(?=(\d{3})+(?!\d))/g,
-                                          ","
-                                        )
-                                      }
-                                      parser={(value) =>
-                                        value.replace(/\$\s?|(,*)/g, "")
-                                      }
-                                      onKeyPress={(event) => {
-                                        if (!/[0-9]/.test(event.key)) {
-                                          event.preventDefault();
-                                        }
-                                      }}
-                                      onChange={(e) =>
-                                        this.onChange(e, "amount_paid")
-                                      }
-                                    />
-                                    {/* {submitted && this.state.amount_paid > this.totalCost() && (
-                                                    <div style={{ color: "red" }}>Amount received is more than total Cost</div>
-                                                )} */}
-                                  </InputGroup>
-                                </Form.Group>
+                                <Form.Label>Clients</Form.Label>
+                                <AsyncPaginate
+                                  onChange={this.handleClientChange}
+                                  loadOptions={this.loadClients(clients)}
+                                  additional={{
+                                    page: 1,
+                                  }}
+                                />
                               </Col>
-                              <Col md="4" style={{ marginBottom: 20 }}>
-                                <FormGroup className="form-date">
-                                  <Form.Label> Due Date</Form.Label>
-                                  <ReactDatetime
-                                    value={due_date}
-                                    dateFormat={"MMM D, YYYY"}
-                                    closeOnSelect
-                                    onChange={(e) =>
-                                      this.onChange(e, "due_date")
-                                    }
-                                    inputProps={{
-                                      required: true,
-                                      className: "form-control date-width",
-                                    }}
-                                    timeFormat={false}
-                                  />
-                                </FormGroup>
+                              <Col md={4}>
+                                <div>
+                                  <Form.Label>New Clients</Form.Label>
+                                </div>
+                                <ButtonGroup>
+                                  <Button
+                                    variant="outline-primary"
+                                    size="sm"
+                                    onClick={() => this.toggleAddClient()}
+                                  >
+                                    + New Client
+                                  </Button>
+                                </ButtonGroup>
                               </Col>
                               <Col md={4}>
                                 <Form.Group>
@@ -1032,38 +968,75 @@ export class PosOrderIndex extends Component {
                                 </Form.Group>
                               </Col>
                             </Row>
-                          )}
-                        </tr>
-                        <tr className="border-0">
-                          <td></td>
-                        </tr>
-                      </Table>
-                      <Table
-                        responsive
-                        className="table-centered table-nowrap rounded mb-0"
-                      >
-                        <tr className="border-0" style={{ border: "none" }}>
-                          <td>
-                            <div>
-                              {cartItem.length > 0 ? (
-                                <div>
-                                  <Button
-                                    variant="outline-primary"
-                                    type="submit"
-                                    disabled={saving}
-                                    onClick={this.onSaveSales}
-                                  >
-                                    Checkout
-                                  </Button>
-                                </div>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      </Table>
-                    </div>
+                          </tr>
+                          <tr>
+                            {cartItem.length > 0 && (
+                              <Row
+                                style={{
+                                  border: "1px #eee solid",
+                                  padding: "10px 5px 0px",
+                                  margin: "10px 15px",
+                                  borderRadius: 7,
+                                }}
+                              >
+                                <Col md={4}>
+                                  <Form.Group className="mb-2">
+                                    <Form.Label>Amount Received</Form.Label>
+                                    <InputGroup>
+                                      <InputNumber
+                                        style={{
+                                          width: "auto",
+                                          height: 40,
+                                          paddingTop: 5,
+                                          borderRadius: 5,
+                                          fontSize: 18,
+                                        }}
+                                        formatter={(value) =>
+                                          `${value}`.replace(
+                                            /\B(?=(\d{3})+(?!\d))/g,
+                                            ","
+                                          )
+                                        }
+                                        parser={(value) =>
+                                          value.replace(/\$\s?|(,*)/g, "")
+                                        }
+                                        onKeyPress={(event) => {
+                                          if (!/[0-9]/.test(event.key)) {
+                                            event.preventDefault();
+                                          }
+                                        }}
+                                        onChange={(e) =>
+                                          this.onChange(e, "amount_paid")
+                                        }
+                                      />
+                                    </InputGroup>
+                                  </Form.Group>
+                                </Col>
+                                <Col md={2}></Col>
+                                <Col md={4}>
+                                  <div style={{ paddingTop: 30 }}>
+                                    {cartItem.length > 0 ? (
+                                      <div>
+                                        <Button
+                                          variant="outline-primary"
+                                          type="submit"
+                                          disabled={saving}
+                                          onClick={this.onSaveSales}
+                                        >
+                                          Checkout
+                                        </Button>
+                                      </div>
+                                    ) : (
+                                      ""
+                                    )}
+                                  </div>
+                                </Col>
+                              </Row>
+                            )}
+                          </tr>
+                        </Table>
+                      </div>
+                    </>
                   ) : (
                     <Row>
                       <Col md={2}></Col>
@@ -1079,6 +1052,7 @@ export class PosOrderIndex extends Component {
                 </Card.Body>
               </Col>
             </Row>
+            <Row></Row>
           </Card>
         </div>
       </>
