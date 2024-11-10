@@ -32,12 +32,15 @@ import { FormGroup, CardHeader, Media, Input, Modal } from "reactstrap";
 import moment from "moment";
 import ReactDatetime from "react-datetime";
 import AddClient from "../clients/AddClient";
-import { getClients, getInvoiceId } from "../../services/invoiceService";
+import { getInvoiceId } from "../../services/invoiceService";
+import { getClients } from "../../services/clientService";
 import { currencies } from "./Currency";
-import Invoice from "./Invoice";
 import ReactToPrint from "react-to-print";
-import { InputNumber, Popover, Button } from "antd";
-import { AsyncPaginate } from "react-select-async-paginate";
+import { InputNumber, Popover, Button, Select, Spin } from "antd";
+
+import Invoice2 from "./Invoice2";
+
+const { Option } = Select;
 
 const InvoiceOverview = (
   <div>
@@ -101,6 +104,7 @@ export class AddInvoice extends Component {
     super(props);
     this.state = {
       rows: 10,
+      page: 1,
       loading: false,
       client_id: "",
       invoice_no: "",
@@ -112,8 +116,8 @@ export class AddInvoice extends Component {
       description: "",
       validation: {},
       errors: {},
-      issue_date: moment().startOf("month"),
-      due_date: moment().startOf("month"),
+      issue_date: moment().startOf("day"),
+      due_date: moment().startOf("day"),
       clients: [],
       currencies: currencies,
       invoice_last_id: "",
@@ -126,6 +130,8 @@ export class AddInvoice extends Component {
       english_ordinal_rules: new Intl.PluralRules("en", { type: "ordinal" }),
       suffixes: { one: "st", two: "nd", few: "rd", other: "th" },
       total_balance: 0,
+      prev_balance: 0,
+      pos_items: [],
     };
     this.baseState = this.state;
   }
@@ -185,26 +191,6 @@ export class AddInvoice extends Component {
     this.setState({ hideNav: window.innerWidth <= 760 });
   }
 
-  getClients = (page, search) => {
-    const { rows } = this.state;
-    getClients({ rows, page, search }).then(
-      (res) => {
-        this.setState({
-          clients: res.clients.data.map((opt) => ({
-            label: opt.name,
-            value: opt.id,
-          })),
-          currency: "",
-          purchase_order_no: "",
-          amount_paid: 0,
-        });
-      },
-      (error) => {
-        this.setState({ loading: false });
-      }
-    );
-  };
-
   getInvoiceId = () => {
     //this.setState({loading:true})
 
@@ -225,23 +211,46 @@ export class AddInvoice extends Component {
     this.setState({ addClient: !this.state.addClient });
   };
 
-  loadClients =
-    (data) =>
-    async (search, loadedOptions, { page }) => {
-      await this.getClients(page, search);
-      console.log(data);
-      //const new_data = {data}
+  getClients = () => {
+    const { page, rows, search, clients } = this.state;
+    this.setState({ loading: true });
+    getClients({ page, rows, search }).then(
+      (res) => {
+        this.setState({
+          clients: [...clients, ...res.clients.data],
+          loading: false,
+        });
+      },
+      (error) => {
+        this.setState({ loading: false });
+      }
+    );
+  };
 
-      return {
-        options: data,
-        hasMore: data.length >= 10,
-        additional: {
-          page: search ? 2 : page + 1,
-        },
-      };
-    };
-  handleClientChange = async (client) => {
-    await this.setState({ client_id: client.value });
+  handlePopupScroll = (e) => {
+    const { loading, hasMore } = this.state;
+
+    if (loading || !hasMore) return;
+
+    const { target } = e;
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      this.setState(
+        (prevState) => ({ page: prevState.page + 1 }),
+        () => this.getClients()
+      );
+    }
+  };
+
+  handleSearchClient = (value) => {
+    this.setState({ search: value, page: 1, clients: [], hasMore: true }, () =>
+      this.getClients()
+    );
+  };
+
+  handleClientChange = (selected) => {
+    this.setState({
+      client_id: selected.value,
+    });
   };
 
   onSaveInvoice = async (e) => {
@@ -262,9 +271,7 @@ export class AddInvoice extends Component {
     } = this.state;
 
     this.setState({ submitted: true });
-    // let check_payment = amount_paid > this.totalCost();
-    // let check_name = items.some(ele => ele.name === '');
-    // let check_name_length = items.some(ele => ele.name.length > 24);
+
     let check_description = items.some((ele) => ele.item_description === "");
     let check_quantity =
       items.some((ele) => ele.quantity === 0) ||
@@ -378,7 +385,8 @@ export class AddInvoice extends Component {
           description: "",
           receipt: res.data.invoice,
           new_items: res.data.items,
-          total_balance: res.total_balance,
+          total_balance: res.data.total_balance,
+          prev_balance: res.data.prev_balance,
         });
         this.getInvoiceId();
         this.getClients();
@@ -465,17 +473,21 @@ export class AddInvoice extends Component {
       currency,
       due_date,
       saving,
+      pos_items,
+      prev_balance,
     } = this.state;
     return (
       <>
         {receipt && (
           <div style={{ display: "none" }}>
-            <Invoice
+            <Invoice2
+              pos_items={pos_items}
+              items={new_items}
               invoice={receipt}
               company={company}
               user={user}
-              items={new_items}
               total_balance={total_balance}
+              prev_balance={prev_balance}
               ref={(el) => (this.componentRef = el)}
               toggle={() => this.setState({ receipt: [] })}
             />
@@ -577,30 +589,7 @@ export class AddInvoice extends Component {
                       </InputGroup>
                     </Form.Group>
                   </Col>
-                  {/* <Col md={4}style={{ marginBottom:20,}}>
 
-                                        <Form.Group className="mb-2">
-                                            <Form.Label>Purchase Order No</Form.Label>
-                                            <InputGroup>
-                                                <InputGroup.Text>
-                                                    <FontAwesomeIcon icon={faPencilAlt} />
-                                                </InputGroup.Text>
-                                                <Input
-
-                                                    type="text" placeholder="Purchase order No"
-                                                    name='purchase_order_no'
-                                                    onChange={async (e) => {
-                                                        await this.onChange(e.target.value, "purchase_order_no");
-                                                    }}
-                                                    required
-
-
-                                                />
-                                            </InputGroup>
-
-                                        </Form.Group>
-
-                                    </Col> */}
                   <Col md="4" style={{ marginBottom: 20 }}>
                     <FormGroup className="form-date">
                       <Form.Label> Date </Form.Label>
@@ -653,13 +642,23 @@ export class AddInvoice extends Component {
                 >
                   <Col md={6} style={{ marginBottom: 20 }}>
                     <Form.Label>Clients</Form.Label>
-                    <AsyncPaginate
+                    <Select
+                      showSearch
+                      labelInValue
+                      placeholder="Search Clients"
+                      filterOption={false}
+                      onSearch={this.handleSearchClient}
+                      onPopupScroll={this.handlePopupScroll}
                       onChange={this.handleClientChange}
-                      loadOptions={this.loadClients(clients)}
-                      additional={{
-                        page: 1,
-                      }}
-                    />
+                      notFoundContent={loading ? <Spin size="small" /> : null}
+                      style={{ width: "100%" }}
+                    >
+                      {clients.map((client) => (
+                        <Option key={client.id} value={client.id}>
+                          {client.name}
+                        </Option>
+                      ))}
+                    </Select>
                   </Col>
                   <Col md={4} style={{ marginBottom: 20 }}>
                     <div>

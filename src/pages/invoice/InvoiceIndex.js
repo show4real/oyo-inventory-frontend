@@ -633,6 +633,17 @@ export class InvoiceIndex extends Component {
                           >
                             View
                           </Button>
+                          {invoice.payment_type == "POS" && (
+                            <Button
+                              variant="outline-primary"
+                              onClick={() => {
+                                this.props.history.push("/pos/" + invoice.id);
+                              }}
+                              size="sm"
+                            >
+                              Edit
+                            </Button>
+                          )}
                           <Button
                             variant="outline-danger"
                             // disabled={invoice.payment_type == 'POS' ? true : false}

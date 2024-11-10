@@ -75,6 +75,7 @@ export class EditInvoice extends Component {
       clients: [],
       currencies: [],
       hideNav: false,
+      prev_balance: 0,
     };
   }
 
@@ -331,6 +332,7 @@ export class EditInvoice extends Component {
           items: res.items,
           pos_items: res.pos_items,
           total_balance: res.total_balance,
+          prev_balance: res.prev_balance,
           loading: false,
           edit: false,
         });
@@ -406,27 +408,11 @@ export class EditInvoice extends Component {
       invoice,
       show,
       total_balance,
+      prev_balance,
     } = this.state;
     return (
       <>
-        {console.log(pos_items)}
-
         {loading && <SpinDiv text={"Loading..."} />}
-        {invoice && (
-          <div style={{ display: "none" }}>
-            <Invoice
-              items={items}
-              pos_items={pos_items}
-              invoice={invoice}
-              company={company}
-              user={user}
-              total_balance={total_balance}
-              //previous_payment={payments.map(payment => payment.amount_paid).reduce((prev, curr) => prev + curr, 0)}
-              ref={(el) => (this.componentRef = el)}
-              toggle={() => this.setState({ invoice: [] })}
-            />
-          </div>
-        )}
 
         {invoice && (
           <div style={{ display: "none" }}>
@@ -437,7 +423,7 @@ export class EditInvoice extends Component {
               company={company}
               user={user}
               total_balance={total_balance}
-              //previous_payment={payments.map(payment => payment.amount_paid).reduce((prev, curr) => prev + curr, 0)}
+              prev_balance={prev_balance}
               ref={(el) => (this.componentRef2 = el)}
               toggle={() => this.setState({ invoice: [] })}
             />
@@ -536,7 +522,7 @@ export class EditInvoice extends Component {
           <Card.Body className="pb-0">
             <Row>
               <Row>
-                <Col md={10}>
+                <Col md={12}>
                   <Row style={{ marginBottom: 20 }}>
                     <Col md={2}>
                       <ButtonGroup>
@@ -554,7 +540,7 @@ export class EditInvoice extends Component {
                           )}
                       </ButtonGroup>
                     </Col>
-                    <Col md={4} style={{ fontSize: 20, fontWeight: "bold" }}>
+                    <Col md={3} style={{ fontSize: 20, fontWeight: "bold" }}>
                       Amount :<span>{invoice.currency}</span>
                       {this.formatCurrency(invoice.amount)}
                     </Col>
@@ -563,15 +549,15 @@ export class EditInvoice extends Component {
                       Paid: <span>{invoice.currency}</span>
                       {this.formatCurrency(invoice.total_payment)}
                     </Col>
-                    <Col md={3} style={{ fontSize: 20, fontWeight: "bold" }}>
+                    <Col md={4} style={{ fontSize: 20, fontWeight: "bold" }}>
                       Balance: <span>{invoice.currency}</span>
                       {this.formatCurrency(invoice.total_balance)}
                     </Col>
                   </Row>
                   <Row>
-                    <Col md={12} style={{ fontSize: 20, fontWeight: "bold" }}>
+                    <span style={{ fontSize: 13, fontWeight: "bold" }}>
                       Cashier: <span>{invoice.cashier_name}</span>
-                    </Col>
+                    </span>
                   </Row>
                   <Row
                     style={{
@@ -581,7 +567,7 @@ export class EditInvoice extends Component {
                       borderRadius: 7,
                     }}
                   >
-                    <Col md={4} className="mb-3">
+                    <Col md={3} className="mb-3">
                       <Form.Group id="Invoice no">
                         <Form.Label>Invoice No</Form.Label>
                         <InputGroup>
@@ -600,31 +586,8 @@ export class EditInvoice extends Component {
                         </InputGroup>
                       </Form.Group>
                     </Col>
-                    {/* <Col md={4}>
 
-                      <Form.Group className="mb-2">
-                        <Form.Label>Purchase Order No</Form.Label>
-                        <InputGroup>
-                          <InputGroup.Text>
-                            <FontAwesomeIcon icon={faPencilAlt} />
-                          </InputGroup.Text>
-                          <Input
-
-                            type="text"
-                            value={invoice.purchase_order_no || ''}
-                            disabled={!edit}
-                            name='purchase_order_no'
-                            onChange={async (e) => {
-                              await this.onChange(e.target.value, "purchase_order_no");
-                            }}
-
-                          />
-                        </InputGroup>
-
-                      </Form.Group>
-
-                    </Col> */}
-                    <Col md="4">
+                    <Col md="3">
                       <FormGroup className="form-date">
                         <Form.Label> Date</Form.Label>
                         <ReactDatetime
@@ -645,15 +608,6 @@ export class EditInvoice extends Component {
                         />
                       </FormGroup>
                     </Col>
-                  </Row>
-                  <Row
-                    style={{
-                      border: "1px #eee solid",
-                      padding: "10px 5px 0px",
-                      margin: "15px 2px",
-                      borderRadius: 7,
-                    }}
-                  >
                     <Col md="3">
                       <FormGroup className="form-date">
                         <Form.Label> Due Date</Form.Label>
@@ -674,78 +628,7 @@ export class EditInvoice extends Component {
                         />
                       </FormGroup>
                     </Col>
-                    {/* <Col md={3}>
-                      <Form.Group className="mb-2">
-                        <Form.Label>Currency</Form.Label>
-
-                        <Form.Select
-                          value={invoice.currency}
-                          onChange={async (e) => {
-                            await this.onChange(e.target.value, "currency");
-                          }}
-                          style={{
-                            marginRight: 10,
-                            width: "100%",
-                          }}
-                          disabled={!edit}
-                        >
-                          <option value="">Select Currency</option>
-                          {currencies.length == 0 && ""}
-                          {currencies.map((p, index) => (
-                            <option value={p.abbrev} key={p}>
-                              {p.name}
-                            </option>
-                          ))}
-                        </Form.Select>
-                      </Form.Group>
-                    </Col> */}
                     <Col md={3}>
-                      <Form.Group className="mb-2">
-                        <Form.Label>Clients</Form.Label>
-
-                        <Form.Select
-                          onChange={async (e) => {
-                            await this.onChange(e.target.value, "client_id");
-                          }}
-                          value={invoice.client_id}
-                          style={{
-                            marginRight: 10,
-                            width: "100%",
-                          }}
-                          disabled={!edit}
-                        >
-                          <option value="">Select Client</option>
-                          {clients.length == 0 && ""}
-                          {clients.map((p, index) => (
-                            <option value={p.id} key={p}>
-                              {p.name}
-                            </option>
-                          ))}
-                        </Form.Select>
-                      </Form.Group>
-                    </Col>
-                    <Col md={2}>
-                      <ButtonGroup>
-                        <Button
-                          variant="outline-primary"
-                          size="sm"
-                          disabled={!edit}
-                          onClick={() => this.toggleAddClient()}
-                        >
-                          + New Client
-                        </Button>
-                      </ButtonGroup>
-                    </Col>
-                  </Row>
-                  <Row
-                    style={{
-                      border: "1px #eee solid",
-                      padding: "10px 5px 0px",
-                      margin: "15px 2px",
-                      borderRadius: 7,
-                    }}
-                  >
-                    <Col md={4}>
                       <Form.Group className="mb-2">
                         <Form.Label>Total Purchase</Form.Label>
                         <InputGroup>
@@ -760,7 +643,16 @@ export class EditInvoice extends Component {
                         </InputGroup>
                       </Form.Group>
                     </Col>
-                    <Col md={6}>
+                  </Row>
+                  <Row
+                    style={{
+                      border: "1px #eee solid",
+                      padding: "10px 5px 0px",
+                      margin: "15px 2px",
+                      borderRadius: 7,
+                    }}
+                  >
+                    <Col md={4}>
                       <Form.Group className="mb-2">
                         <Form.Label>Amount Received</Form.Label>
                         <InputGroup>
@@ -788,50 +680,58 @@ export class EditInvoice extends Component {
                             value={invoice.total_payment}
                             onChange={(e) => this.onChange(e, "amount_paid")}
                           />
-                          {submitted &&
-                            invoice.amount_paid > this.totalCost() && (
-                              <div style={{ color: "red" }}>
-                                Amount received is more than total Cost
-                              </div>
-                            )}
                         </InputGroup>
                       </Form.Group>
                     </Col>
+                    <Col md={3}>
+                      <Form.Group className="mb-2">
+                        <Form.Label>Clients</Form.Label>
+
+                        <Form.Select
+                          onChange={async (e) => {
+                            await this.onChange(e.target.value, "client_id");
+                          }}
+                          value={invoice.client_id}
+                          style={{
+                            marginRight: 10,
+                            width: "100%",
+                          }}
+                          disabled={!edit}
+                        >
+                          <option value="">Select Client</option>
+                          {clients.length == 0 && ""}
+                          {clients.map((p, index) => (
+                            <option value={p.id} key={p}>
+                              {p.name}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                    <Col md={2} style={{ paddingTop: 20 }}>
+                      <ButtonGroup>
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          disabled={!edit}
+                          onClick={() => this.toggleAddClient()}
+                        >
+                          + New Client
+                        </Button>
+                      </ButtonGroup>
+                    </Col>
                   </Row>
-                  {/* <Row
+                  <Row
                     style={{
                       border: "1px #eee solid",
                       padding: "10px 5px 0px",
                       margin: "15px 2px",
                       borderRadius: 7,
                     }}
-                  >
-                    <Col md={6}>
-                      <Form.Group>
-                        <Form.Label>Invoice Description</Form.Label>
-                        <InputGroup>
-                          <Input
-                            type="textarea"
-                            disabled={!edit}
-                            value={invoice.description}
-                            rows={3}
-                            cols={10}
-                            placeholder={`Invoice Description `}
-                            onChange={async (e) => {
-                              await this.onChange(
-                                e.target.value,
-                                "description"
-                              );
-                            }}
-                          />
-                        </InputGroup>
-                      </Form.Group>
-                    </Col>
-                  </Row> */}
+                  ></Row>
                 </Col>
               </Row>
-              {/* sudo rm -rf /var/lib/docker/overlay2/eec5ec505ef2d5ab9250a8a2dd06a83215af4c0fef159cbcf4f045678341d516
-              sudo umount -l /var/lib/docker/overlay2/eec5ec505ef2d5ab9250a8a2dd06a83215af4c0fef159cbcf4f045678341d516/merged */}
+
               <Row
                 style={{
                   border: "1px #eee solid",
@@ -840,7 +740,7 @@ export class EditInvoice extends Component {
                   borderRadius: 7,
                 }}
               >
-                <Form.Label style={{ fontSize: 25 }}>ITEMS SECTION</Form.Label>
+                <Form.Label style={{ fontSize: 15 }}>ITEMS</Form.Label>
 
                 {items.length > 0
                   ? items.map((item, key) => (
@@ -853,142 +753,126 @@ export class EditInvoice extends Component {
                           borderRadius: 7,
                         }}
                       >
-                        <Form.Label style={{ fontSize: 20 }}>
-                          {this.ordinal(key + 1)} Item
-                        </Form.Label>
                         <Row style={{ margin: "15px 10px 0px 10px " }}>
-                          <Col md={6}>
-                            <Row>
-                              <Col md={12}>
-                                <Form.Group className="mb-2">
-                                  <Form.Label>Description</Form.Label>
-                                  <InputGroup>
-                                    <InputGroup.Text>
-                                      <FontAwesomeIcon icon={faPencilAlt} />
-                                    </InputGroup.Text>
-                                    <Input
-                                      type="textarea"
-                                      rows={3}
-                                      cols={100}
-                                      disabled={!edit}
-                                      placeholder={`Item nme description ${
-                                        key + 1
-                                      }`}
-                                      value={item.description}
-                                      onChange={(e) =>
-                                        this.handleInputChange(e, key)
-                                      }
-                                      name="description"
-                                      class="w-auto"
-                                    />
-                                  </InputGroup>
-                                </Form.Group>
-                                {submitted && !item.description && (
-                                  <div style={{ color: "red" }}>
-                                    Description is required
-                                  </div>
-                                )}
-                              </Col>
-                            </Row>
-                            <Row>
-                              <Col md={12}>
-                                <Form.Label>Quantity</Form.Label>
-                                <Form.Group className="mb-2">
-                                  <InputGroup>
-                                    <InputGroup.Text>
-                                      <FontAwesomeIcon icon={faPencilAlt} />
-                                    </InputGroup.Text>
-                                    <Input
-                                      type="text"
-                                      disabled={!edit}
-                                      name="quantity"
-                                      placeholder={`Item quantity ${key + 1}`}
-                                      value={item.quantity}
-                                      class="w-auto"
-                                      onChange={(e) =>
-                                        this.handleInputNumericChange(e, key)
-                                      }
-                                    />
-                                  </InputGroup>
-                                </Form.Group>
-                                {submitted && !item.quantity && (
-                                  <div style={{ color: "red" }}>
-                                    Quantity is required
-                                  </div>
-                                )}
-                              </Col>
-                            </Row>
+                          <Col md={3}>
+                            <Form.Group className="mb-2">
+                              <Form.Label>Description</Form.Label>
+                              <InputGroup>
+                                <InputGroup.Text>
+                                  <FontAwesomeIcon icon={faPencilAlt} />
+                                </InputGroup.Text>
+                                <Input
+                                  type="text"
+                                  disabled={!edit}
+                                  placeholder={`Item nme description ${
+                                    key + 1
+                                  }`}
+                                  value={item.description}
+                                  onChange={(e) =>
+                                    this.handleInputChange(e, key)
+                                  }
+                                  name="description"
+                                  class="w-auto"
+                                />
+                              </InputGroup>
+                            </Form.Group>
+                            {submitted && !item.description && (
+                              <div style={{ color: "red" }}>
+                                Description is required
+                              </div>
+                            )}
                           </Col>
-
-                          <Col md={6}>
+                          <Col md={2}>
+                            <Form.Label>Quantity</Form.Label>
+                            <Form.Group className="mb-2">
+                              <InputGroup>
+                                <InputGroup.Text>
+                                  <FontAwesomeIcon icon={faPencilAlt} />
+                                </InputGroup.Text>
+                                <Input
+                                  type="text"
+                                  disabled={!edit}
+                                  name="quantity"
+                                  placeholder={`Item quantity ${key + 1}`}
+                                  value={item.quantity}
+                                  class="w-auto"
+                                  onChange={(e) =>
+                                    this.handleInputNumericChange(e, key)
+                                  }
+                                />
+                              </InputGroup>
+                            </Form.Group>
+                            {submitted && !item.quantity && (
+                              <div style={{ color: "red" }}>
+                                Quantity is required
+                              </div>
+                            )}
+                          </Col>
+                          <Col md={2}>
+                            <Form.Group>
+                              <Form.Label>Price</Form.Label>
+                              <InputGroup>
+                                <InputGroup.Text>
+                                  <FontAwesomeIcon icon={faPencilAlt} />
+                                </InputGroup.Text>
+                                <Input
+                                  type="text"
+                                  disabled={!edit}
+                                  placeholder={`Item Price ${key + 1}`}
+                                  value={item.rate}
+                                  onChange={(e) =>
+                                    this.handleInputNumericChange(e, key)
+                                  }
+                                  name="rate"
+                                  class="w-auto"
+                                />
+                              </InputGroup>
+                            </Form.Group>
+                            {submitted && !item.rate && (
+                              <div style={{ color: "red" }}>
+                                Price is required
+                              </div>
+                            )}
+                          </Col>
+                          <Col md={3}>
+                            <Form.Group className="mb-2">
+                              <Form.Label>Amount</Form.Label>
+                              <InputGroup>
+                                <Input
+                                  disabled
+                                  type="text"
+                                  value={item.quantity * item.rate}
+                                />
+                              </InputGroup>
+                            </Form.Group>
+                          </Col>
+                          <Col md={2} style={{ marginBottom: 10 }}>
                             <Row>
-                              <Col md={3}>
-                                <Form.Group>
-                                  <Form.Label>Price</Form.Label>
-                                  <InputGroup>
-                                    <InputGroup.Text>
-                                      <FontAwesomeIcon icon={faPencilAlt} />
-                                    </InputGroup.Text>
-                                    <Input
-                                      type="text"
-                                      disabled={!edit}
-                                      placeholder={`Item Price ${key + 1}`}
-                                      value={item.rate}
-                                      onChange={(e) =>
-                                        this.handleInputNumericChange(e, key)
-                                      }
-                                      name="rate"
-                                      class="w-auto"
-                                    />
-                                  </InputGroup>
-                                </Form.Group>
-                                {submitted && !item.rate && (
-                                  <div style={{ color: "red" }}>
-                                    Price is required
-                                  </div>
-                                )}
-                              </Col>
-                              <Col md={3}>
-                                <Form.Group className="mb-2">
-                                  <Form.Label>Amount</Form.Label>
-                                  <InputGroup>
-                                    <Input
-                                      disabled
-                                      type="text"
-                                      value={item.quantity * item.rate}
-                                    />
-                                  </InputGroup>
-                                </Form.Group>
-                              </Col>
-                              <Col md={3} style={{ marginBottom: 10 }}>
-                                <Row>
-                                  <Form.Label>More Items</Form.Label>
-                                </Row>
-
-                                <ButtonGroup>
-                                  {items.length && items.length - 1 === key && (
-                                    <Button
-                                      variant="outline-primary"
-                                      size="md"
-                                      disabled={!edit}
-                                      onClick={this.handleAddItem}
-                                    >
-                                      +
-                                    </Button>
-                                  )}
-                                  {items.length && items.length !== 1 && (
-                                    <Button
-                                      variant="outline-danger"
-                                      size="md"
-                                      disabled={!edit}
-                                      onClick={this.handleRemoveItem(key)}
-                                    >
-                                      X
-                                    </Button>
-                                  )}
-                                </ButtonGroup>
-                              </Col>
+                              <Form.Label>More Items</Form.Label>
                             </Row>
+
+                            <ButtonGroup>
+                              {items.length && items.length - 1 === key && (
+                                <Button
+                                  variant="outline-primary"
+                                  size="md"
+                                  disabled={!edit}
+                                  onClick={this.handleAddItem}
+                                >
+                                  +
+                                </Button>
+                              )}
+                              {items.length && items.length !== 1 && (
+                                <Button
+                                  variant="outline-danger"
+                                  size="md"
+                                  disabled={!edit}
+                                  onClick={this.handleRemoveItem(key)}
+                                >
+                                  X
+                                </Button>
+                              )}
+                            </ButtonGroup>
                           </Col>
                         </Row>
                       </Col>
@@ -996,7 +880,7 @@ export class EditInvoice extends Component {
                   : ""}
                 {pos_items.length > 1
                   ? pos_items.map((item, key) => (
-                      <Col
+                      <Row
                         md={12}
                         style={{
                           border: "1px #eee solid",
@@ -1005,111 +889,91 @@ export class EditInvoice extends Component {
                           borderRadius: 7,
                         }}
                       >
-                        <Form.Label style={{ fontSize: 20 }}>
-                          {this.ordinal(key + 1)} Item
-                        </Form.Label>
-                        <Row style={{ margin: "15px 10px 0px 10px " }}>
-                          <Col md={6}>
-                            <Row>
-                              <Col md={12}>
-                                <Form.Group className="mb-2">
-                                  <Form.Label>Description</Form.Label>
-                                  <InputGroup>
-                                    <InputGroup.Text>
-                                      <FontAwesomeIcon icon={faPencilAlt} />
-                                    </InputGroup.Text>
-                                    <Input
-                                      type="textarea"
-                                      rows={3}
-                                      cols={100}
-                                      disabled={!edit}
-                                      placeholder={`Item nme description ${
-                                        key + 1
-                                      }`}
-                                      value={item.order.product_name}
-                                      name="description"
-                                      class="w-auto"
-                                    />
-                                  </InputGroup>
-                                </Form.Group>
-                                {submitted && !item.description && (
-                                  <div style={{ color: "red" }}>
-                                    Description is required
-                                  </div>
-                                )}
-                              </Col>
-                            </Row>
-                            <Row>
-                              <Col md={12}>
-                                <Form.Label>Quantity</Form.Label>
-                                <Form.Group className="mb-2">
-                                  <InputGroup>
-                                    <InputGroup.Text>
-                                      <FontAwesomeIcon icon={faPencilAlt} />
-                                    </InputGroup.Text>
-                                    <Input
-                                      type="text"
-                                      disabled={!edit}
-                                      name="quantity"
-                                      placeholder={`Item quantity ${key + 1}`}
-                                      value={item.qty_sold}
-                                      class="w-auto"
-                                      onChange={(e) =>
-                                        this.handleInputNumericChange(e, key)
-                                      }
-                                    />
-                                  </InputGroup>
-                                </Form.Group>
-                                {submitted && !item.quantity && (
-                                  <div style={{ color: "red" }}>
-                                    Quantity is required
-                                  </div>
-                                )}
-                              </Col>
-                            </Row>
-                          </Col>
-
-                          <Col md={6}>
-                            <Row>
-                              <Col md={3}>
-                                <Form.Group>
-                                  <Form.Label>Price</Form.Label>
-                                  <InputGroup>
-                                    <InputGroup.Text>
-                                      <FontAwesomeIcon icon={faPencilAlt} />
-                                    </InputGroup.Text>
-                                    <Input
-                                      type="text"
-                                      disabled={!edit}
-                                      placeholder={`Item Price ${key + 1}`}
-                                      value={item.selling_price}
-                                      name="rate"
-                                      class="w-auto"
-                                    />
-                                  </InputGroup>
-                                </Form.Group>
-                                {submitted && !item.rate && (
-                                  <div style={{ color: "red" }}>
-                                    Price is required
-                                  </div>
-                                )}
-                              </Col>
-                              <Col md={3}>
-                                <Form.Group className="mb-2">
-                                  <Form.Label>Amount</Form.Label>
-                                  <InputGroup>
-                                    <Input
-                                      disabled
-                                      type="text"
-                                      value={item.qty_sold * item.selling_price}
-                                    />
-                                  </InputGroup>
-                                </Form.Group>
-                              </Col>
-                            </Row>
-                          </Col>
-                        </Row>
-                      </Col>
+                        <Col md={3}>
+                          <Form.Group className="mb-2">
+                            <Form.Label>Description</Form.Label>
+                            <InputGroup>
+                              <InputGroup.Text>
+                                <FontAwesomeIcon icon={faPencilAlt} />
+                              </InputGroup.Text>
+                              <Input
+                                type="text"
+                                disabled={!edit}
+                                placeholder={`Item nme description ${key + 1}`}
+                                value={item.order.product_name}
+                                name="description"
+                                class="w-auto"
+                              />
+                            </InputGroup>
+                          </Form.Group>
+                          {submitted && !item.description && (
+                            <div style={{ color: "red" }}>
+                              Description is required
+                            </div>
+                          )}
+                        </Col>
+                        <Col md={2}>
+                          <Form.Label>Quantity</Form.Label>
+                          <Form.Group className="mb-2">
+                            <InputGroup>
+                              <InputGroup.Text>
+                                <FontAwesomeIcon icon={faPencilAlt} />
+                              </InputGroup.Text>
+                              <Input
+                                type="text"
+                                disabled={!edit}
+                                name="quantity"
+                                placeholder={`Item quantity ${key + 1}`}
+                                value={item.qty_sold}
+                                class="w-auto"
+                                onChange={(e) =>
+                                  this.handleInputNumericChange(e, key)
+                                }
+                              />
+                            </InputGroup>
+                          </Form.Group>
+                          {submitted && !item.quantity && (
+                            <div style={{ color: "red" }}>
+                              Quantity is required
+                            </div>
+                          )}
+                        </Col>
+                        <Col md={3}>
+                          <Form.Group>
+                            <Form.Label>Price</Form.Label>
+                            <InputGroup>
+                              <InputGroup.Text>
+                                <FontAwesomeIcon icon={faPencilAlt} />
+                              </InputGroup.Text>
+                              <Input
+                                type="text"
+                                disabled={!edit}
+                                placeholder={`Item Price ${key + 1}`}
+                                value={item.selling_price}
+                                name="rate"
+                                class="w-auto"
+                              />
+                            </InputGroup>
+                          </Form.Group>
+                          {submitted && !item.rate && (
+                            <div style={{ color: "red" }}>
+                              Price is required
+                            </div>
+                          )}
+                        </Col>
+                        <Col md={3}>
+                          <Form.Group className="mb-2">
+                            <Form.Label>Amount</Form.Label>
+                            <InputGroup>
+                              <Input
+                                disabled
+                                type="text"
+                                value={item.qty_sold * item.selling_price}
+                              />
+                            </InputGroup>
+                          </Form.Group>
+                        </Col>
+                      </Row>
                     ))
                   : ""}
                 <Row>

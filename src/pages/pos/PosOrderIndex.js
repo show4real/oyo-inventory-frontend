@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { Input, Media } from "reactstrap";
-import { getStock } from "../../services/purchaseOrderService";
 import { toast } from "react-toastify";
-import Cart from "./Cart";
 import {
   Col,
   Row,
@@ -12,27 +10,25 @@ import {
   ButtonGroup,
   Breadcrumb,
   Form,
-  FormGroup,
   InputGroup,
 } from "@themesberg/react-bootstrap";
-import SpinDiv from "../components/SpinDiv";
 import { throttle, debounce } from "../debounce";
 import { addSales } from "../../services/posOrderService";
 import ReactToPrint from "react-to-print";
 import { Invoice } from "./Invoice";
-import { Pagination } from "antd";
+import { Pagination, Select, Spin } from "antd";
 import { getBranchStocks } from "../../services/stockService";
-import Select from "react-select";
-import makeAnimated from "react-select/animated";
 import { getCompany } from "../../services/companyService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { getAllClients, getInvoiceId } from "../../services/invoiceService";
-import { AsyncPaginate } from "react-select-async-paginate";
 import AddClient from "../clients/AddClient";
 import moment from "moment";
 import ReactDatetime from "react-datetime";
 import { InputNumber } from "antd";
+import { getClients } from "../../services/clientService";
+
+const { Option } = Select;
 
 export class PosOrderIndex extends Component {
   constructor(props) {
@@ -75,6 +71,8 @@ export class PosOrderIndex extends Component {
       invoice: {},
       pos_items: [],
       total_balance: 0,
+      prev_balance: 0,
+      loading: false,
     };
 
     this.searchDebounced = debounce(this.getPurchaseOrders, 500);
@@ -90,15 +88,14 @@ export class PosOrderIndex extends Component {
     localStorage.removeItem("cart_details");
   }
 
-  getClients = (search) => {
-    const { rows } = this.state;
-    getAllClients({ search }).then(
+  getClients = () => {
+    const { page, rows, search, clients } = this.state;
+    this.setState({ loading: true });
+    getClients({ page, rows, search }).then(
       (res) => {
         this.setState({
-          clients: res.clients.map((opt) => ({
-            label: opt.name,
-            value: opt.id,
-          })),
+          clients: [...clients, ...res.clients.data],
+          loading: false,
         });
       },
       (error) => {
@@ -107,8 +104,30 @@ export class PosOrderIndex extends Component {
     );
   };
 
-  handleClientChange = async (client) => {
-    await this.setState({ client_id: client.value });
+  handlePopupScroll = (e) => {
+    const { loading, hasMore } = this.state;
+
+    if (loading || !hasMore) return;
+
+    const { target } = e;
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      this.setState(
+        (prevState) => ({ page: prevState.page + 1 }),
+        () => this.getClients()
+      );
+    }
+  };
+
+  handleSearchClient = (value) => {
+    this.setState({ search: value, page: 1, clients: [], hasMore: true }, () =>
+      this.getClients()
+    );
+  };
+
+  handleClientChange = (selected) => {
+    this.setState({
+      client_id: selected.value,
+    });
   };
 
   getInvoiceId = () => {
@@ -130,21 +149,6 @@ export class PosOrderIndex extends Component {
   toggleAddClient = () => {
     this.setState({ addClient: !this.state.addClient });
   };
-
-  loadClients =
-    (data) =>
-    async (search, loadedOptions, { page }) => {
-      await this.getClients(page, search);
-      console.log(data);
-
-      return {
-        options: data,
-        hasMore: data.length >= 10000,
-        additional: {
-          page: search ? 2 : page + 1,
-        },
-      };
-    };
 
   getCompany = () => {
     const { product_id, id, rows, page } = this.state;
@@ -264,8 +268,6 @@ export class PosOrderIndex extends Component {
       client_id,
       due_date,
       amount_paid,
-      saving,
-      attributes,
     } = this.state;
     console.log(cartItem);
     addSales({
@@ -289,6 +291,7 @@ export class PosOrderIndex extends Component {
           invoice: res.invoice,
           pos_items: res.pos_items,
           total_balance: res.total_balance,
+          prev_balance: res.prev_balance,
           cartItem: [],
         });
         console.log(this.state.cart_details);
@@ -517,9 +520,11 @@ export class PosOrderIndex extends Component {
       cart_details,
       pos_items,
       total_balance,
+      prev_balance,
       invoice,
       user,
       saving,
+      loading,
     } = this.state;
     return (
       <>
@@ -530,6 +535,7 @@ export class PosOrderIndex extends Component {
               invoice={invoice}
               company={company}
               total_balance={total_balance}
+              prev_balance={prev_balance}
               user={user}
               ref={(el) => (this.componentRef = el)}
               toggle={() => this.setState({ invoice: {} })}
@@ -844,33 +850,6 @@ export class PosOrderIndex extends Component {
                                   </td>
 
                                   <td>
-                                    {/* <InputNumber
-                                    style={{
-                                      width: "auto",
-                                      height: 40,
-                                      paddingTop: 5,
-                                      borderRadius: 5,
-                                      fontSize: 18,
-                                    }}
-                                    value={sale.order.unit_selling_price}
-                                    formatter={(value) =>
-                                      `${value}`.replace(
-                                        /\B(?=(\d{3})+(?!\d))/g,
-                                        ","
-                                      )
-                                    }
-                                    parser={(value) =>
-                                      value.replace(/\$\s?|(,*)/g, "")
-                                    }
-                                    onKeyPress={(event) => {
-                                      if (!/[0-9]/.test(event.key)) {
-                                        event.preventDefault();
-                                      }
-                                    }}
-                                    onChange={(event) =>
-                                      this.handlePriceChange(event, key)
-                                    }
-                                  /> */}
                                     <input
                                       style={{
                                         width: 100,
@@ -917,13 +896,25 @@ export class PosOrderIndex extends Component {
                             >
                               <Col md={4}>
                                 <Form.Label>Clients</Form.Label>
-                                <AsyncPaginate
+                                <Select
+                                  showSearch
+                                  labelInValue
+                                  placeholder="Search Clients"
+                                  filterOption={false}
+                                  onSearch={this.handleSearchClient}
+                                  onPopupScroll={this.handlePopupScroll}
                                   onChange={this.handleClientChange}
-                                  loadOptions={this.loadClients(clients)}
-                                  additional={{
-                                    page: 1,
-                                  }}
-                                />
+                                  notFoundContent={
+                                    loading ? <Spin size="small" /> : null
+                                  }
+                                  style={{ width: "100%" }}
+                                >
+                                  {clients.map((client) => (
+                                    <Option key={client.id} value={client.id}>
+                                      {client.name}
+                                    </Option>
+                                  ))}
+                                </Select>
                               </Col>
                               <Col md={4}>
                                 <div>

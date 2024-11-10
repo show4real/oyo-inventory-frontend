@@ -54,7 +54,8 @@ export class Invoice extends React.Component {
   };
 
   render() {
-    const { invoice, company, items, pos_items, total_balance } = this.props;
+    const { invoice, company, items, pos_items, total_balance, prev_balance } =
+      this.props;
     const combinedItems = this.combineItems(pos_items);
 
     return (
@@ -161,12 +162,12 @@ export class Invoice extends React.Component {
               }}
             >
               Total: {this.formatCurrency2(invoice.amount)}
-              {total_balance > 0 && (
-                <>
-                  <br />
-                  Balance: {this.formatCurrency2(total_balance)}
-                </>
-              )}
+              <br />
+              Balance: {invoice.amount - invoice.amount_paid}
+              <br />
+              Previous Balance: {prev_balance}
+              <br />
+              Total Balance: {this.formatCurrency2(total_balance)}
             </div>
 
             <footer
