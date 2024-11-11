@@ -34,8 +34,9 @@ export class PosOrderIndex extends Component {
     super(props);
     this.state = {
       search: "",
+      search_client: "",
       page: 1,
-      rows: 10,
+      rows: 20,
       loading: false,
       saving: false,
       stocks: [],
@@ -50,7 +51,7 @@ export class PosOrderIndex extends Component {
       close: false,
       cartItem: [],
       payment_mode: "",
-      amount_paid: "",
+      amount_paid: 0,
       client_id: "",
       total_purchase: 0,
       user: JSON.parse(localStorage.getItem("user")),
@@ -78,9 +79,9 @@ export class PosOrderIndex extends Component {
   }
 
   getClients = () => {
-    const { page, rows, search, clients } = this.state;
+    const { page, rows, search, clients, search_client } = this.state;
     this.setState({ loading: true });
-    getClients({ page, rows, search }).then(
+    getClients({ page, rows, search: search_client }).then(
       (res) => {
         this.setState({
           clients: [...clients, ...res.clients.data],
@@ -108,8 +109,9 @@ export class PosOrderIndex extends Component {
   };
 
   handleSearchClient = (value) => {
-    this.setState({ search: value, page: 1, clients: [], hasMore: true }, () =>
-      this.getClients()
+    this.setState(
+      { search_client: value, page: 1, clients: [], hasMore: true },
+      () => this.getClients()
     );
   };
 
@@ -195,25 +197,19 @@ export class PosOrderIndex extends Component {
     const { cartItem, company, payment_mode, amount_paid, client_id } =
       this.state;
 
-    let check_serials =
+    let check_quantity =
       cartItem.some((ele) => ele.quantity === 0) ||
       cartItem.some((ele) => ele.quantity === undefined);
 
     toast.dismiss();
     toast.configure({ hideProgressBar: true, closeButton: false });
 
-    if (check_serials) {
-      if (company.sell_by_serial_no == 1) {
-        this.showToastError("Please Select serials");
-      } else {
-        this.showToastError("Please Select Quantity");
-      }
+    if (check_quantity) {
+      this.showToastError("Please Select Quantity");
     } else if (payment_mode == "") {
       this.showToastError("Please Add Payment Mode");
     } else if (client_id == "") {
       this.showToastError("Please Select a client");
-    } else if (amount_paid == "") {
-      this.showToastError("Please Add Amount Received");
     } else {
       this.saveSales();
     }
@@ -427,7 +423,10 @@ export class PosOrderIndex extends Component {
 
     updatedCartItems[index].order.unit_selling_price = newPrice;
 
-    this.setState({ cartItem: updatedCartItems });
+    this.setState(
+      { cartItem: updatedCartItems },
+      this.updateCartItemInLocalStorage
+    );
   };
 
   render() {
@@ -489,7 +488,8 @@ export class PosOrderIndex extends Component {
                     }}
                   >
                     <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
-                    <Breadcrumb.Item href="#POS">POS</Breadcrumb.Item>
+                    <Breadcrumb.Item href="/invoices">Invoices</Breadcrumb.Item>
+                    <Breadcrumb.Item href="#">POS</Breadcrumb.Item>
                   </Breadcrumb>
                 </div>
               </div>

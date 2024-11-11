@@ -33,8 +33,9 @@ export class PosOrderIndex extends Component {
     super(props);
     this.state = {
       search: "",
+      search_client: "",
       page: 1,
-      rows: 10,
+      rows: 20,
       loading: false,
       saving: false,
       stocks: [],
@@ -55,7 +56,7 @@ export class PosOrderIndex extends Component {
       options: [],
       serials2: [],
       payment_mode: "",
-      amount_paid: "",
+      amount_paid: 0,
       client_id: "",
       selectedClient: { value: "", label: "" },
       total_purchase: 0,
@@ -79,12 +80,15 @@ export class PosOrderIndex extends Component {
     this.getPurchaseOrders();
     this.getClients();
     this.getCompany();
+
+    const savedCartItem = JSON.parse(localStorage.getItem("cartItem")) || [];
+    this.setState({ cartItem: savedCartItem });
   }
 
   getClients = () => {
-    const { page, rows, search, clients } = this.state;
+    const { page, rows, search, clients, search_client } = this.state;
     this.setState({ loading: true });
-    getClients({ page, rows, search }).then(
+    getClients({ page, rows, search: search_client }).then(
       (res) => {
         this.setState({
           clients: [...clients, ...res.clients.data],
@@ -112,8 +116,9 @@ export class PosOrderIndex extends Component {
   };
 
   handleSearchClient = (value) => {
-    this.setState({ search: value, page: 1, clients: [], hasMore: true }, () =>
-      this.getClients()
+    this.setState(
+      { search_client: value, page: 1, clients: [], hasMore: true },
+      () => this.getClients()
     );
   };
 
@@ -157,9 +162,7 @@ export class PosOrderIndex extends Component {
       console.log(item.quantity);
     }
     items.splice(index, 1, item);
-    this.setState({
-      cartItem: items,
-    });
+    this.setState({ cartItem: items }, this.updateCartItemInLocalStorage);
   }
 
   decrementCount(item, index) {
@@ -168,10 +171,8 @@ export class PosOrderIndex extends Component {
       item.quantity -= 1;
     }
     items.splice(index, 1, item);
-    this.setState({
-      cartItem: items,
-    });
-    console.log(this.state.cartItem);
+
+    this.setState({ cartItem: items }, this.updateCartItemInLocalStorage);
   }
 
   showToastError = (msg) => {
@@ -197,8 +198,6 @@ export class PosOrderIndex extends Component {
       this.showToastError("Please Add Payment Mode");
     } else if (client_id == "") {
       this.showToastError("Please Select a client");
-    } else if (amount_paid == "") {
-      this.showToastError("Please Add Amount Received");
     } else {
       this.saveSales();
     }
@@ -288,6 +287,11 @@ export class PosOrderIndex extends Component {
     await this.setState({ page, rows });
     await this.getPurchaseOrders();
   };
+
+  updateCartItemInLocalStorage = () => {
+    localStorage.setItem("cartItem", JSON.stringify(this.state.cartItem));
+  };
+
   getPurchaseOrders = () => {
     const { page, rows, order, search, invoice_id } = this.state;
 
@@ -313,6 +317,7 @@ export class PosOrderIndex extends Component {
         this.setState({ loading: false });
       }
     );
+    this.setState(this.updateCartItemInLocalStorage);
   };
 
   toggleFilter = () => {
@@ -328,8 +333,7 @@ export class PosOrderIndex extends Component {
   toggleAddToCart = (addToCart) => {
     var items = this.state.cartItem === null ? [] : [...this.state.cartItem];
     items.push(addToCart);
-    this.setState({ cartItem: items });
-    this.setState({ cartI: items });
+    this.setState({ cartItem: items }, this.updateCartItemInLocalStorage);
   };
 
   inCart = (cartId) => {
@@ -383,7 +387,10 @@ export class PosOrderIndex extends Component {
 
     updatedCartItems[index].order.unit_selling_price = newPrice;
 
-    this.setState({ cartItem: updatedCartItems });
+    this.setState(
+      { cartItem: updatedCartItems },
+      this.updateCartItemInLocalStorage
+    );
   };
 
   render() {
@@ -446,7 +453,8 @@ export class PosOrderIndex extends Component {
                     }}
                   >
                     <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
-                    <Breadcrumb.Item href="#POS">POS</Breadcrumb.Item>
+                    <Breadcrumb.Item href="/invoices">Invoices</Breadcrumb.Item>
+                    <Breadcrumb.Item href="#">POS</Breadcrumb.Item>
                   </Breadcrumb>
                 </div>
               </div>
