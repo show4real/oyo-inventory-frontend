@@ -24,7 +24,6 @@ import { faCheck, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { getAllClients, getInvoiceId } from "../../services/invoiceService";
 import AddClient from "../clients/AddClient";
 import moment from "moment";
-import ReactDatetime from "react-datetime";
 import { InputNumber } from "antd";
 import { getClients } from "../../services/clientService";
 
@@ -42,29 +41,18 @@ export class PosOrderIndex extends Component {
       stocks: [],
       cart_details: [],
       clients: [],
-      invoice_last_id: "",
       transaction_id: "",
-      sold_at: "",
-      created_at: "",
       products: [],
-      total_cost: [],
-
-      order: "",
-      value: "",
+      total_cost: 0,
       invoice_no: "",
       total: 0,
       total_cart: 0,
       close: false,
       cartItem: [],
-      options: [],
-      cartCheckout: [],
-      serials2: [],
       payment_mode: "",
       amount_paid: "",
       client_id: "",
       total_purchase: 0,
-      selectedSerials: [],
-      cart_sold: JSON.parse(localStorage.getItem("cart_sold")),
       user: JSON.parse(localStorage.getItem("user")),
       company: {},
       due_date: moment().startOf("month"),
@@ -84,8 +72,9 @@ export class PosOrderIndex extends Component {
     this.getCompany();
     this.getClients();
     this.getInvoiceId();
-    localStorage.removeItem("cart_sold");
-    localStorage.removeItem("cart_details");
+
+    const savedCartItem = JSON.parse(localStorage.getItem("cartItem")) || [];
+    this.setState({ cartItem: savedCartItem });
   }
 
   getClients = () => {
@@ -171,22 +160,6 @@ export class PosOrderIndex extends Component {
     this.setState({ [state]: e });
   };
 
-  handleInputChange = (item, index) => (selectedSerials) => {
-    const items = this.state.cartItem;
-    let new_serials = selectedSerials.map((obj) => {
-      return obj.value;
-    });
-
-    item.new_serials = new_serials;
-
-    item.quantity = selectedSerials.length;
-    items.splice(index, 1, item);
-    this.setState({
-      cartItem: items,
-    });
-    console.log(this.state.cartItem);
-  };
-
   incrementCount(item, index) {
     // index will be the key value
     const items = this.state.cartItem;
@@ -198,9 +171,8 @@ export class PosOrderIndex extends Component {
       console.log(item.quantity);
     }
     items.splice(index, 1, item);
-    this.setState({
-      cartItem: items,
-    });
+
+    this.setState({ cartItem: items }, this.updateCartItemInLocalStorage);
   }
 
   decrementCount(item, index) {
@@ -210,10 +182,7 @@ export class PosOrderIndex extends Component {
       item.quantity -= 1;
     }
     items.splice(index, 1, item);
-    this.setState({
-      cartItem: items,
-    });
-    console.log(this.state.cartItem);
+    this.setState({ cartItem: items }, this.updateCartItemInLocalStorage);
   }
 
   showToastError = (msg) => {
@@ -254,7 +223,7 @@ export class PosOrderIndex extends Component {
     const list = this.state.cartItem;
 
     list.splice(index, 1);
-    this.setState({ cartItem: list });
+    this.setState({ cartItem: list }, this.updateCartItemInLocalStorage);
   }
 
   saveSales = () => {
@@ -269,7 +238,6 @@ export class PosOrderIndex extends Component {
       due_date,
       amount_paid,
     } = this.state;
-    console.log(cartItem);
     addSales({
       cart_items: cartItem,
       payment_mode: payment_mode,
@@ -286,18 +254,14 @@ export class PosOrderIndex extends Component {
         this.setState({
           cart_details: res.pos_items,
           transaction_id: res.pos_order.transaction_id,
-          //payment_mode: res.payment_mode,
-          //sold_at: res.sold_at,
           invoice: res.invoice,
           pos_items: res.pos_items,
           total_balance: res.total_balance,
           prev_balance: res.prev_balance,
           cartItem: [],
         });
-        console.log(this.state.cart_details);
-
-        localStorage.removeItem("cart");
         this.showToast("Sales has been created");
+        localStorage.removeItem("cartItem");
       },
       (error) => {
         console.log(error);
@@ -346,16 +310,12 @@ export class PosOrderIndex extends Component {
   }
 
   clearCart() {
-    localStorage.removeItem("cart");
-    localStorage.removeItem("cart_sold");
-    localStorage.removeItem("cart_details");
     this.setState({
       cartItem: [],
-      cartCheckout: [],
       cart_details: [],
-      cart_sold: [],
     });
     this.getPurchaseOrders();
+    localStorage.removeItem("cartItem");
   }
 
   showToast = (msg) => {
@@ -367,8 +327,7 @@ export class PosOrderIndex extends Component {
     await this.getPurchaseOrders();
   };
   getPurchaseOrders = () => {
-    const { page, rows, order, search, products } = this.state;
-    console.log(order);
+    const { page, rows, order, search } = this.state;
     this.setState({ loading: true });
     getBranchStocks({ page, rows, order, search }).then(
       (res) => {
@@ -400,38 +359,8 @@ export class PosOrderIndex extends Component {
       }, ms);
     });
 
-  loadOptions = async (search, prevOptions) => {
-    options = [];
-    var options = this.state.products;
-    await this.sleep(1000);
-
-    let filteredOptions;
-    if (!search) {
-      filteredOptions = options;
-    } else {
-      const searchLower = search.toLowerCase();
-
-      filteredOptions = options.filter(({ label }) =>
-        label.toLowerCase().includes(searchLower)
-      );
-    }
-
-    const hasMore = filteredOptions.length > prevOptions.length + 10;
-    const slicedOptions = filteredOptions.slice(
-      prevOptions.length,
-      prevOptions.length + 10
-    );
-
-    return {
-      options: slicedOptions,
-      hasMore,
-    };
-  };
-
-  onFilter = async (e, filter) => {
-    console.log(filter);
-    await this.setState({ [filter]: e });
-    await this.getPurchaseOrders();
+  updateCartItemInLocalStorage = () => {
+    localStorage.setItem("cartItem", JSON.stringify(this.state.cartItem));
   };
 
   toggleAddToCart = (addToCart) => {
@@ -444,16 +373,13 @@ export class PosOrderIndex extends Component {
     } else {
       items.push(addToCart);
     }
-    console.log(items);
-    this.setState({ cartItem: items });
-    this.setState({ cartI: items });
-    localStorage.setItem("cart", JSON.stringify(items));
+    this.setState({ cartItem: items }, this.updateCartItemInLocalStorage);
   };
 
   inCart = (cartId) => {
     let inCartIds = this.state.cartItem;
 
-    if (inCartIds !== null && localStorage.getItem("cart") !== null) {
+    if (inCartIds !== null) {
       var result = inCartIds.map((product, key) => {
         return product.id;
       });
