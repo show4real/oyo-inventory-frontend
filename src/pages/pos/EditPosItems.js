@@ -80,9 +80,6 @@ export class PosOrderIndex extends Component {
     this.getPurchaseOrders();
     this.getClients();
     this.getCompany();
-
-    const savedCartItem = JSON.parse(localStorage.getItem("cartItem")) || [];
-    this.setState({ cartItem: savedCartItem });
   }
 
   getClients = () => {
@@ -162,7 +159,7 @@ export class PosOrderIndex extends Component {
       console.log(item.quantity);
     }
     items.splice(index, 1, item);
-    this.setState({ cartItem: items }, this.updateCartItemInLocalStorage);
+    this.setState({ cartItem: items });
   }
 
   decrementCount(item, index) {
@@ -172,7 +169,7 @@ export class PosOrderIndex extends Component {
     }
     items.splice(index, 1, item);
 
-    this.setState({ cartItem: items }, this.updateCartItemInLocalStorage);
+    this.setState({ cartItem: items });
   }
 
   showToastError = (msg) => {
@@ -317,7 +314,6 @@ export class PosOrderIndex extends Component {
         this.setState({ loading: false });
       }
     );
-    this.setState(this.updateCartItemInLocalStorage);
   };
 
   toggleFilter = () => {
@@ -333,7 +329,7 @@ export class PosOrderIndex extends Component {
   toggleAddToCart = (addToCart) => {
     var items = this.state.cartItem === null ? [] : [...this.state.cartItem];
     items.push(addToCart);
-    this.setState({ cartItem: items }, this.updateCartItemInLocalStorage);
+    this.setState({ cartItem: items });
   };
 
   inCart = (cartId) => {
@@ -387,10 +383,7 @@ export class PosOrderIndex extends Component {
 
     updatedCartItems[index].order.unit_selling_price = newPrice;
 
-    this.setState(
-      { cartItem: updatedCartItems },
-      this.updateCartItemInLocalStorage
-    );
+    this.setState({ cartItem: updatedCartItems });
   };
 
   render() {
@@ -454,7 +447,7 @@ export class PosOrderIndex extends Component {
                   >
                     <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
                     <Breadcrumb.Item href="/invoices">Invoices</Breadcrumb.Item>
-                    <Breadcrumb.Item href="#">POS</Breadcrumb.Item>
+                    <Breadcrumb.Item href="/pos">New POS</Breadcrumb.Item>
                   </Breadcrumb>
                 </div>
               </div>
