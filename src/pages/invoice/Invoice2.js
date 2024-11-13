@@ -88,7 +88,7 @@ export class Invoice extends React.Component {
               }}
             >
               <div style={{ textAlign: "left", fontWeight: "bold" }}>
-                Date: {moment(invoice.issued_date).format("MMM DD YYYY")}
+                Date: {moment(invoice.created_at).format("MMM DD YYYY, h:mm A")}
                 <br />
                 Invoice #: {invoice.invoice_no}
                 <br />

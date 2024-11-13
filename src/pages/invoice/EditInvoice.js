@@ -373,15 +373,8 @@ export class EditInvoice extends Component {
   getBalance() {
     const { payments, invoice } = this.state;
     const total_amount = invoice.amount;
-    const previous_payment = payments
-      .map((payment) => payment.amount_paid)
-      .reduce((prev, curr) => prev + curr, 0);
-
-    const balance = total_amount - previous_payment;
     return this.setState({
       total_amount: total_amount,
-      balance: balance,
-      previous_payment: previous_payment,
     });
   }
 
@@ -540,24 +533,35 @@ export class EditInvoice extends Component {
                           )}
                       </ButtonGroup>
                     </Col>
-                    <Col md={3} style={{ fontSize: 20, fontWeight: "bold" }}>
-                      Amount :<span>{invoice.currency}</span>
+                    <Col md={3} style={{ fontSize: 15, fontWeight: "bold" }}>
+                      Invoice Amount :<span>{invoice.currency}</span>
                       {this.formatCurrency(invoice.amount)}
                     </Col>
 
-                    <Col md={3} style={{ fontSize: 20, fontWeight: "bold" }}>
+                    <Col md={3} style={{ fontSize: 15, fontWeight: "bold" }}>
                       Paid: <span>{invoice.currency}</span>
                       {this.formatCurrency(invoice.total_payment)}
                     </Col>
-                    <Col md={4} style={{ fontSize: 20, fontWeight: "bold" }}>
-                      Balance: <span>{invoice.currency}</span>
-                      {this.formatCurrency(invoice.total_balance)}
+                    <Col md={3} style={{ fontSize: 15, fontWeight: "bold" }}>
+                      Invoice Balance: <span>{invoice.currency}</span>
+                      {this.formatCurrency(invoice.balance)}
                     </Col>
                   </Row>
                   <Row>
-                    <span style={{ fontSize: 13, fontWeight: "bold" }}>
-                      Cashier: <span>{invoice.cashier_name}</span>
-                    </span>
+                    <Col md={4} style={{ fontSize: 15, fontWeight: "bold" }}>
+                      Previous Client Balance: <span>{invoice.currency}</span>
+                      {this.formatCurrency(prev_balance)}
+                    </Col>
+
+                    <Col md={4} style={{ fontSize: 15, fontWeight: "bold" }}>
+                      Total Client Balance: <span>{invoice.currency}</span>
+                      {this.formatCurrency(total_balance)}
+                    </Col>
+                    <Col md={4}>
+                      <span style={{ fontSize: 15, fontWeight: "bold" }}>
+                        Cashier: <span>{invoice.cashier_name}</span>
+                      </span>
+                    </Col>
                   </Row>
                   <Row
                     style={{
@@ -1005,6 +1009,20 @@ export class EditInvoice extends Component {
                         Balance:{" "}
                         <span style={{ fontSize: 15 }}>{invoice.currency}</span>
                         {this.formatCurrency(invoice.total_balance)}
+                      </Col>
+                    </Row>
+                    <Row style={{ fontSize: 20, fontWeight: "bold" }}>
+                      <Col md={12}>
+                        Prev Balance:{" "}
+                        <span style={{ fontSize: 15 }}>{invoice.currency}</span>
+                        {this.formatCurrency(prev_balance)}
+                      </Col>
+                    </Row>
+                    <Row style={{ fontSize: 20, fontWeight: "bold" }}>
+                      <Col md={12}>
+                        Total Balance:{" "}
+                        <span style={{ fontSize: 15 }}>{invoice.currency}</span>
+                        {this.formatCurrency(total_balance)}
                       </Col>
                     </Row>
                     {edit && (
