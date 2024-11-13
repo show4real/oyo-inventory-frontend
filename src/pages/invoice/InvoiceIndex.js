@@ -597,7 +597,7 @@ export class InvoiceIndex extends Component {
                   <th className="border-0">Total Purchase</th>
                   <th className="border-0">Balance</th>
                   <th className="border-0">Issue Date</th>
-                  <th className="border-0">Due Date</th>
+                  {/* <th className="border-0">Due Date</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -617,10 +617,14 @@ export class InvoiceIndex extends Component {
                         {this.formatCurrency(invoice.total_balance)}
                       </td>
                       <td>
-                        {moment(invoice.issued_date).format("MMM DD YYYY")}
+                        {moment(invoice.created_at).format(
+                          "MMM DD YYYY h:mm A"
+                        )}
                       </td>
 
-                      <td>{moment(invoice.due_date).format("MMM DD YYYY")}</td>
+                      {/* <td>
+                        {moment(invoice.due_date).format("MMM DD YYYY h:mm A")}
+                      </td> */}
 
                       <td>
                         <ButtonGroup>

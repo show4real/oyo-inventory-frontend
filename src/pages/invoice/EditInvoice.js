@@ -882,7 +882,7 @@ export class EditInvoice extends Component {
                       </Col>
                     ))
                   : ""}
-                {pos_items.length > 1
+                {pos_items.length > 0
                   ? pos_items.map((item, key) => (
                       <Row
                         md={12}
