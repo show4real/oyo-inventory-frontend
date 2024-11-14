@@ -41,14 +41,21 @@ export class Invoice extends React.Component {
 
   combineItems = (items) => {
     return items.reduce((acc, item) => {
+      // Find an existing item with the same product_name and selling_price
       const existingItem = acc.find(
-        (i) => i.order.product_name === item.order.product_name
+        (i) =>
+          i.order.product_name === item.order.product_name &&
+          i.selling_price === item.selling_price
       );
+
       if (existingItem) {
+        // Increment qty_sold if an item with matching name and price exists
         existingItem.qty_sold += item.qty_sold;
       } else {
+        // Push the item as a new entry if no match was found
         acc.push({ ...item });
       }
+
       return acc;
     }, []);
   };

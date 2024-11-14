@@ -46,6 +46,7 @@ import EditSerial from "./EditSerial";
 import ReturnOrder from "./ReturnOrder";
 import { Tooltip } from "antd";
 import EditPrice from "./EditPrice";
+import AddMoreOrder from "./AddMoreOrder";
 
 export class Order extends Component {
   constructor(props) {
@@ -356,8 +357,18 @@ export class Order extends Component {
     this.getPurchaseOrders();
   };
 
+  toggleCloseAddOrder = () => {
+    this.setState({ addOrder: !this.state.addOrder });
+    this.getPurchaseOrders();
+  };
+
   toggleChangePrice = (editPrice) => {
     this.setState({ editPrice });
+    this.getPurchaseOrders();
+  };
+
+  toggleAddMoreOrder = (addOrder) => {
+    this.setState({ addOrder });
     this.getPurchaseOrders();
   };
 
@@ -391,6 +402,7 @@ export class Order extends Component {
       viewMovedOrder,
       editPrice,
       returnOrder,
+      addOrder,
     } = this.state;
 
     return (
@@ -439,6 +451,14 @@ export class Order extends Component {
         {editPrice && (
           <EditPrice stock={editPrice} toggle={() => this.toggleClosePrice()} />
         )}
+
+        {addOrder && (
+          <AddMoreOrder
+            stock={addOrder}
+            toggle={() => this.toggleCloseAddOrder()}
+          />
+        )}
+
         {addAttributes && (
           <AddAttribute
             saved={this.getPurchaseOrders}
@@ -996,6 +1016,20 @@ export class Order extends Component {
                                     }
                                   >
                                     Edit Prices
+                                  </Button>
+                                )}
+                              </td>
+                              <td>
+                                {stock.quantity_moved > 0 && (
+                                  <Button
+                                    variant="outline-primary"
+                                    type="submit"
+                                    disabled={saving}
+                                    onClick={() =>
+                                      this.toggleAddMoreOrder(stock)
+                                    }
+                                  >
+                                    Add more Quantity
                                   </Button>
                                 )}
                               </td>
