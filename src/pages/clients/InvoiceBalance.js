@@ -92,14 +92,11 @@ export class InvoiceBalance extends React.Component {
               marginTop: 20,
             }}
           >
-            Last Purchase Total: {invoice.currency}
-            {this.formatCurrency2(invoice.amount)}
-            <br />
-            Last Purchase Balance: {invoice.currency}
-            {invoice.amount - invoice.amount_paid}
-            <br />
             Previous Balance: {invoice.currency}
-            {prev_balance}
+            {invoice.amount_paid + total_balance}
+            <br />
+            Paid: {invoice.currency}
+            {this.formatCurrency2(invoice.amount_paid)}
             <br />
             Total Balance: {invoice.currency}
             {this.formatCurrency2(total_balance)}

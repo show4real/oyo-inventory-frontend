@@ -127,13 +127,21 @@ class ClientPayments extends Component {
                     {data.client_invoices_payments.data.length > 0 &&
                       data.client_invoices_payments.data[0].client_name}
                   </p>
-                  <p>
-                    <strong>Balance:</strong> NGN{" "}
-                    {this.formatCurrency(data.balance)}
-                  </p>
+
                   <p>
                     <strong>Previous Balance:</strong> NGN{" "}
-                    {this.formatCurrency(data.prev_balance)}
+                    {data.client_invoices_payments.data.length > 0 &&
+                      this.formatCurrency(
+                        data.client_invoices_payments.data[0].amount_paid +
+                          data.total_balance
+                      )}
+                  </p>
+                  <p>
+                    <strong>Paid:</strong> NGN{" "}
+                    {data.client_invoices_payments.data.length > 0 &&
+                      this.formatCurrency(
+                        data.client_invoices_payments.data[0].amount_paid
+                      )}
                   </p>
                   <p>
                     <strong>Total Balance:</strong> NGN{" "}
