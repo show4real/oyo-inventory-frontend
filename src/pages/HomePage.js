@@ -54,6 +54,7 @@ import SingleProduct from "./products/SingleProduct";
 import Order from "./purchase/Order";
 import Supplier from "./suppliers/Supplier";
 import AddInvoice from "./invoice/AddInvoice";
+import ClientPayments from "./clients/ClientPayments";
 import EditInvoice from "./invoice/EditInvoice";
 import StockIndex from "./stocks/StockIndex";
 import Stock from "./stocks/Stock";
@@ -238,6 +239,11 @@ export default () => (
       exact
       path={Routes.AddInvoice.path}
       component={AddInvoice}
+    />
+    <RouteWithSidebar
+      exact
+      path={Routes.ClientPayments.path}
+      component={ClientPayments}
     />
     <RouteWithSidebar
       exact

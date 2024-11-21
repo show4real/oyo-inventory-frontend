@@ -104,7 +104,9 @@ export class Invoice extends React.Component {
                 {company.address}
               </div>
               <div style={{ textAlign: "right", fontWeight: "bold" }}>
-                <strong>Client:</strong> {invoice.client.name}
+                <strong>Customer</strong>
+                <br />
+                {invoice.client.name}
                 <br />
                 {invoice.client.phone}
                 <br />
@@ -168,13 +170,20 @@ export class Invoice extends React.Component {
                 marginBottom: "10px",
               }}
             >
-              Total: {this.formatCurrency2(invoice.amount)}
+              Total: {invoice.currency}
+              {this.formatCurrency2(invoice.amount)}
               <br />
-              Balance: {invoice.amount - invoice.amount_paid}
+              Paid: {invoice.currency}
+              {this.formatCurrency2(invoice.amount_paid)}
               <br />
-              Previous Balance: {prev_balance}
+              Balance: {invoice.currency}
+              {invoice.amount - invoice.amount_paid}
               <br />
-              Total Balance: {this.formatCurrency2(total_balance)}
+              Previous Balance: {invoice.currency}
+              {prev_balance}
+              <br />
+              Total Balance: {invoice.currency}
+              {this.formatCurrency2(total_balance)}
             </div>
 
             <footer
