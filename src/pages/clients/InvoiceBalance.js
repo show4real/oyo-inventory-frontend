@@ -90,15 +90,16 @@ export class InvoiceBalance extends React.Component {
               textAlign: "left",
               marginBottom: "10px",
               marginTop: 20,
+              textTransform: "capitalize",
             }}
           >
             Previous Balance: {invoice.currency}
-            {invoice.amount_paid + total_balance}
+            {this.formatCurrency2(invoice.amount_paid + total_balance)}
             <br />
             Paid: {invoice.currency}
             {this.formatCurrency2(invoice.amount_paid)}
             <br />
-            Total Balance: {invoice.currency}
+            Ledger Balance: {invoice.currency}
             {this.formatCurrency2(total_balance)}
           </div>
 

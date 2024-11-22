@@ -143,7 +143,7 @@ class ClientPayments extends Component {
                         data.client_invoices_payments.data[0].amount_paid
                       )}
                   </p>
-                  <p>
+                  <p style={{ paddingBottom: 20 }}>
                     <strong>Total Balance:</strong> NGN{" "}
                     {this.formatCurrency(data.total_balance)}
                   </p>
@@ -163,7 +163,7 @@ class ClientPayments extends Component {
 
             {/* Pagination */}
             <Row>
-              <Col md={12} style={{ fontWeight: "bold", paddingTop: 3 }}>
+              <Col md={12} style={{ fontWeight: "bold", paddingTop: 30 }}>
                 {total > 0 && (
                   <Pagination
                     showSizeChanger
@@ -183,12 +183,24 @@ class ClientPayments extends Component {
                 <div
                   style={{
                     display: "inline-table",
-                    fontSize: 15,
+                    fontSize: 18,
                     fontWeight: "bold",
-                    margin: 10,
+                    paddingBottom: 35,
+                    paddingTop: 35,
                   }}
                 >
-                  <span>Invoice No: {invoice.invoice_no}</span>
+                  <span style={{ paddingLeft: 20 }}>
+                    Invoice No: {invoice.invoice_no}
+                  </span>
+                  <span style={{ paddingLeft: 20 }}>
+                    Amount: {invoice.amount}
+                  </span>
+                  <span style={{ paddingLeft: 20 }}>
+                    Total Payment : {invoice.amount_paid}
+                  </span>
+                  <span style={{ paddingLeft: 20 }}>
+                    Balance: {invoice.amount - invoice.amount_paid}
+                  </span>
                   <span style={{ paddingLeft: 20 }}>
                     Date: {moment(invoice.created_at).format("MMM DD YYYY")}
                   </span>
@@ -202,30 +214,21 @@ class ClientPayments extends Component {
                 >
                   <thead className="thead-light">
                     <tr>
-                      <th className="border-0">Invoice No</th>
-                      <th className="border-0">Amount</th>
+                      <th className="border-0">No</th>
+                      <th className="border-0">Inv No</th>
                       <th className="border-0">Paid</th>
-                      <th className="border-0">Balance</th>
                       <th className="border-0">Transaction Date</th>
                     </tr>
                   </thead>
                   <tbody>
                     {invoice.payments.map((payment, idx) => (
                       <tr key={idx} style={{ fontWeight: "bold" }}>
+                        <td>{idx + 1}</td>
                         <td>{payment.invoice_num}</td>
-                        <td>
-                          {invoice.currency}
-                          {this.formatCurrency(payment.amount)}
-                        </td>
+
                         <td>
                           {invoice.currency}
                           {this.formatCurrency(payment.amount_paid)}
-                        </td>
-                        <td>
-                          {invoice.currency}
-                          {this.formatCurrency(
-                            payment.amount - payment.amount_paid
-                          )}
                         </td>
                         <td>
                           {moment(payment.created_at).format("MMM DD YYYY")}
