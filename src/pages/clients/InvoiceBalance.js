@@ -31,7 +31,15 @@ export class InvoiceBalance extends React.Component {
   }
 
   render() {
-    const { invoice, company, total_balance, prev_balance } = this.props;
+    const {
+      invoice,
+      company,
+      total_balance,
+      prev_balance,
+      last_paid,
+      total_amount,
+      total_paid,
+    } = this.props;
 
     return (
       <Card style={{ padding: "10px", width: "100%" }}>
@@ -94,13 +102,13 @@ export class InvoiceBalance extends React.Component {
             }}
           >
             Previous Balance: {invoice.currency}
-            {this.formatCurrency2(invoice.amount_paid + total_balance)}
+            {this.formatCurrency2(total_amount - (total_paid - last_paid))}
             <br />
             Paid: {invoice.currency}
-            {this.formatCurrency2(invoice.amount_paid)}
+            {this.formatCurrency2(last_paid)}
             <br />
             Ledger Balance: {invoice.currency}
-            {this.formatCurrency2(total_balance)}
+            {this.formatCurrency2(total_amount - total_paid)}
           </div>
 
           <footer

@@ -107,6 +107,9 @@ class ClientPayments extends Component {
               company={company}
               total_balance={data.total_balance}
               prev_balance={data.prev_balance}
+              last_paid={data.last_paid}
+              total_amount={data.total_amount}
+              total_paid={data.total_paid}
               user={user}
               ref={(el) => (this.componentRef = el)}
               toggle={() => this.setState({ invoice: {} })}
@@ -129,23 +132,31 @@ class ClientPayments extends Component {
                   </p>
 
                   <p>
+                    <strong>Total Purchases:</strong> NGN{" "}
+                    {data.client_invoices_payments.data.length > 0 &&
+                      this.formatCurrency(data.total_amount)}
+                  </p>
+
+                  <p>
                     <strong>Previous Balance:</strong> NGN{" "}
                     {data.client_invoices_payments.data.length > 0 &&
                       this.formatCurrency(
-                        data.client_invoices_payments.data[0].amount_paid +
-                          data.total_balance
+                        data.total_amount - (data.total_paid - data.last_paid)
                       )}
                   </p>
                   <p>
                     <strong>Paid:</strong> NGN{" "}
                     {data.client_invoices_payments.data.length > 0 &&
-                      this.formatCurrency(
-                        data.client_invoices_payments.data[0].amount_paid
-                      )}
+                      this.formatCurrency(data.last_paid)}
                   </p>
+                  {/* <p>
+                    <strong>Total Paid:</strong> NGN{" "}
+                    {data.client_invoices_payments.data.length > 0 &&
+                      this.formatCurrency(data.total_paid)}
+                  </p> */}
                   <p style={{ paddingBottom: 20 }}>
                     <strong>Total Balance:</strong> NGN{" "}
-                    {this.formatCurrency(data.total_balance)}
+                    {this.formatCurrency(data.total_amount - data.total_paid)}
                   </p>
                   {data.client_invoices_payments.data.length > 0 && (
                     <ReactToPrint
